@@ -1,0 +1,407 @@
+[
+    {
+        "name":  "Auth Send OTP",
+        "method":  "POST",
+        "url":  "https://auth-astronexus-1.onrender.com/api/auth/send-otp",
+        "requiresAuth":  false,
+        "status":  null,
+        "outcome":  "FAIL",
+        "snippet":  "The operation has timed out"
+    },
+    {
+        "name":  "Auth Verify OTP",
+        "method":  "POST",
+        "url":  "https://auth-astronexus-1.onrender.com/api/auth/verify-otp",
+        "requiresAuth":  false,
+        "status":  null,
+        "outcome":  "FAIL",
+        "snippet":  "The operation has timed out"
+    },
+    {
+        "name":  "User Login",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/login",
+        "requiresAuth":  false,
+        "status":  401,
+        "outcome":  "PASS_EXPECTED",
+        "snippet":  "{\"error\":\"Invalid email or password\"}"
+    },
+    {
+        "name":  "User Phone Login",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/login/phone",
+        "requiresAuth":  false,
+        "status":  400,
+        "outcome":  "PASS_VALIDATION",
+        "snippet":  "{\"error\":\"Phone and password are required\"}"
+    },
+    {
+        "name":  "User Signup Astrology",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/signup/astrology",
+        "requiresAuth":  false,
+        "status":  400,
+        "outcome":  "PASS_VALIDATION",
+        "snippet":  "{\"error\":\"Astrology birth details are required\"}"
+    },
+    {
+        "name":  "Get Profile",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/me",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Categories",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/categories",
+        "requiresAuth":  false,
+        "status":  200,
+        "outcome":  "PASS",
+        "snippet":  "[{\"_id\":\"699c91af0512f920bd915138\",\"name\":\"Birth Chart Astrology Readings\",\"isActive\":true,\"order\":3,\"createdAt\":\"2026-02-23T17:43:11.000Z\",\"updatedAt\":\"2026-02-23T17:43:24.408Z\",\"slug\":\"birth-chart-astrology-readings\",\"__v\":0,\"description\":\"Detailed natal chart analysis including planetary position"
+    },
+    {
+        "name":  "Products",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/products",
+        "requiresAuth":  false,
+        "status":  200,
+        "outcome":  "PASS",
+        "snippet":  "[{\"showInHome\":false,\"homePriority\":0,\"_id\":\"699c81650512f920bd914f94\",\"name\":\"Personalized Birth Chart Report (PDF)\",\"description\":\"Detailed digital birth chart (Kundli) analysis prepared using your date, time, and place of birth. Includes planetary positions, dosha analysis, strengths, weaknesses,"
+    },
+    {
+        "name":  "Products Filtered",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/products?category=699c91af0512f920bd915138",
+        "requiresAuth":  false,
+        "status":  200,
+        "outcome":  "PASS",
+        "snippet":  "[{\"showInHome\":false,\"homePriority\":0,\"_id\":\"699c81650512f920bd914f94\",\"name\":\"Personalized Birth Chart Report (PDF)\",\"description\":\"Detailed digital birth chart (Kundli) analysis prepared using your date, time, and place of birth. Includes planetary positions, dosha analysis, strengths, weaknesses,"
+    },
+    {
+        "name":  "Product By Invalid Id",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/products/invalid-id",
+        "requiresAuth":  false,
+        "status":  400,
+        "outcome":  "PASS_VALIDATION",
+        "snippet":  "{\"message\":\"Invalid product ID\"}"
+    },
+    {
+        "name":  "Home Products",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/home-products",
+        "requiresAuth":  false,
+        "status":  200,
+        "outcome":  "PASS",
+        "snippet":  "{\"success\":true,\"count\":3,\"products\":[{\"showInHome\":false,\"homePriority\":0,\"_id\":\"699c81650512f920bd914f94\",\"name\":\"Personalized Birth Chart Report (PDF)\",\"description\":\"Detailed digital birth chart (Kundli) analysis prepared using your date, time, and place of birth. Includes planetary positions, d"
+    },
+    {
+        "name":  "Cart Get",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/cart",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Cart Add",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/cart/add",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Cart Update",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/cart/add",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Cart Remove",
+        "method":  "DELETE",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/cart/remove/invalid-id",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Orders My",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/orders/my",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Order By Invalid Id",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/orders/invalid-id",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Place Order",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/orders",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Create Payment",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/payment/create",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Verify Payment",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/payment/verify",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Addresses Get",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/addresses",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Addresses Add",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/addresses/add",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Addresses Update",
+        "method":  "PUT",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/addresses/invalid-id",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Addresses Delete",
+        "method":  "DELETE",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/addresses/invalid-id",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Wishlist Get",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/wishlist",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Wishlist Add",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/wishlist",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Wishlist Remove",
+        "method":  "DELETE",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/wishlist/remove",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Wallet Get",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/mock-user-id",
+        "requiresAuth":  false,
+        "status":  200,
+        "outcome":  "PASS",
+        "snippet":  "{\"_id\":\"69a46238d9c183076f4d8095\",\"userId\":\"6d6f636b2d757365722d6964\",\"balance\":0,\"createdAt\":\"2026-03-01T15:58:48.689Z\",\"updatedAt\":\"2026-03-01T16:14:50.513Z\",\"__v\":0}"
+    },
+    {
+        "name":  "Wallet Deposit",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/mock-user-id/deposit",
+        "requiresAuth":  false,
+        "status":  200,
+        "outcome":  "PASS",
+        "snippet":  "{\"balance\":100}"
+    },
+    {
+        "name":  "Wallet Withdraw",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/user/mock-user-id/withdraw",
+        "requiresAuth":  false,
+        "status":  200,
+        "outcome":  "PASS",
+        "snippet":  "{\"balance\":0}"
+    },
+    {
+        "name":  "Tarot Random",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/api/tarot/random?n=3",
+        "requiresAuth":  false,
+        "status":  401,
+        "outcome":  "PASS_EXPECTED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Discount List",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/api/discount",
+        "requiresAuth":  false,
+        "status":  200,
+        "outcome":  "PASS",
+        "snippet":  "[{\"_id\":\"699c40ae8c6fab6188ee6b2a\",\"code\":\"OFF50\",\"percentage\":40,\"expiry\":\"2026-03-02T17:25:14.777Z\",\"active\":true,\"createdAt\":\"2026-02-23T11:57:34.183Z\",\"updatedAt\":\"2026-02-23T11:57:34.183Z\",\"__v\":0},{\"_id\":\"699c3fa88c6fab6188ee6b23\",\"code\":\"ASTRONEXUS10\",\"percentage\":10,\"expiry\":\"2026-03-02T17:2"
+    },
+    {
+        "name":  "Discount By Code",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/api/discount/TESTCODE",
+        "requiresAuth":  false,
+        "status":  404,
+        "outcome":  "PASS_EXPECTED",
+        "snippet":  "{\"error\":\"Discount not found or expired\"}"
+    },
+    {
+        "name":  "Discount Apply",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/api/discount/apply",
+        "requiresAuth":  false,
+        "status":  404,
+        "outcome":  "PASS_EXPECTED",
+        "snippet":  "{\"error\":\"Invalid or expired discount\"}"
+    },
+    {
+        "name":  "Feedback List",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/api/feedback/invalid-product-id",
+        "requiresAuth":  false,
+        "status":  500,
+        "outcome":  "PASS_EXPECTED",
+        "snippet":  "{\"success\":false,\"message\":\"Cast to ObjectId failed for value \\\"invalid-product-id\\\" (type string) at path \\\"productId\\\" for model \\\"Feedback\\\"\"}"
+    },
+    {
+        "name":  "Feedback Submit",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/api/feedback",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Notifications List",
+        "method":  "GET",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/api/notifications",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Notifications Mark Read",
+        "method":  "PUT",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/api/notifications/invalid-id/read",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Chatbot Ask",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/api/chatbot/ask",
+        "requiresAuth":  true,
+        "status":  401,
+        "outcome":  "PASS_AUTH_REQUIRED",
+        "snippet":  "{\"error\":\"Access denied. No token provided.\"}"
+    },
+    {
+        "name":  "Birth Chart Generate",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/api/birthchart/generate",
+        "requiresAuth":  false,
+        "status":  null,
+        "outcome":  "FAIL",
+        "snippet":  "The operation has timed out"
+    },
+    {
+        "name":  "Prediction",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/api/prediction",
+        "requiresAuth":  false,
+        "status":  404,
+        "outcome":  "FAIL",
+        "snippet":  "{\"error\":\"Route not found\"}"
+    },
+    {
+        "name":  "Match Making",
+        "method":  "POST",
+        "url":  "https://astro-nexus-new-6-46mo.onrender.com/api/v1/compatibility/match-making/ashtakoot-score",
+        "requiresAuth":  false,
+        "status":  400,
+        "outcome":  "PASS_VALIDATION",
+        "snippet":  "{\"success\":false,\"message\":\"Invalid request body\",\"details\":{\"message\":\"Invalid request body\"}}"
+    },
+    {
+        "name":  "Horoscope Daily",
+        "method":  "GET",
+        "url":  "https://astronexus-horoscope-ogbl.onrender.com/api/horoscope?sign=leo\u0026type=daily",
+        "requiresAuth":  false,
+        "status":  null,
+        "outcome":  "FAIL",
+        "snippet":  "The operation has timed out."
+    },
+    {
+        "name":  "Map Geocode",
+        "method":  "GET",
+        "url":  "https://maps.googleapis.com/maps/api/geocode/json?address=Delhi\u0026key=DUMMY_KEY",
+        "requiresAuth":  false,
+        "status":  200,
+        "outcome":  "PASS",
+        "snippet":  "{\n   \"error_message\" : \"The provided API key is invalid. \",\n   \"results\" : [],\n   \"status\" : \"REQUEST_DENIED\"\n}"
+    },
+    {
+        "name":  "City Search",
+        "method":  "GET",
+        "url":  "https://photon.komoot.io/api/?q=Delhi\u0026limit=1",
+        "requiresAuth":  false,
+        "status":  200,
+        "outcome":  "PASS",
+        "snippet":  "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"properties\":{\"osm_type\":\"R\",\"osm_id\":1942586,\"osm_key\":\"place\",\"osm_value\":\"city\",\"type\":\"city\",\"countrycode\":\"IN\",\"name\":\"Delhi\",\"country\":\"India\",\"extent\":[76.8388351,28.8834464,77.3452524,28.4046285]},\"geometry\":{\"type\":\"Point\",\"coordinat"
+    }
+]

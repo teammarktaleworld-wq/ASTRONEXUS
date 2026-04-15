@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: astronexus-unified
+    env: node
+    plan: free
+    rootDir: .
+    buildCommand: |
+      cd backend && npm ci
+      cd ../Python/horoscope/astronexus-horoscope && npm ci
+      cd ../Python/mati/astro-bot && npm ci
+      python3 -m venv Python/birth_chart/astro-nexus-backend/.venv
+      Python/birth_chart/astro-nexus-backend/.venv/bin/pip install -r Python/birth_chart/astro-nexus-backend/requirements.txt
+    startCommand: cd backend && node index.js
+    envVars:
+      - key: BIRTH_CHART_SERVICE_URL
+        value: http://127.0.0.1:8010
+      - key: HOROSCOPE_SERVICE_URL
+        value: http://127.0.0.1:4000
+      - key: MATI_CHAT_SERVICE_URL
+        value: http://127.0.0.1:3000
+      - key: UNIFIED_AUTOSTART
+        value: "true"
+      - key: UNIFIED_PROXY_TIMEOUT_MS
+        value: "45000"

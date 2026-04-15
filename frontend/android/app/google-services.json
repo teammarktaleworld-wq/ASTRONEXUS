@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "241031523033",
+    "project_id": "astronexus-3bee6",
+    "storage_bucket": "astronexus-3bee6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:241031523033:android:43e9cce1e4563b8d3a6cc8",
+        "android_client_info": {
+          "package_name": "com.example.astro_tale"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfds7c8DGygaDcKtHF4zE4RM9OWjb6SKc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,185 @@
+import "package:astro_tale/core/constants/app_colors.dart";
+import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+
+class ChatBubble extends StatelessWidget {
+  final String text;
+  final bool isUser;
+  final String? userAvatar;
+  final String? botAvatar;
+  final List<String> keywords;
+
+  const ChatBubble({
+    super.key,
+    required this.text,
+    required this.isUser,
+    this.userAvatar,
+    this.botAvatar,
+    this.keywords = const <String>[],
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final maxWidth = MediaQuery.of(context).size.width * 0.72;
+    final textColor = isUser
+        ? Colors.white
+        : (isDark
+              ? Colors.white.withValues(alpha: 0.92)
+              : const Color(0xFF0F172A));
+    final botBubbleColor = isDark
+        ? AppColors.surfaceAlt
+        : Colors.white.withValues(alpha: 0.96);
+    final userGradient = const LinearGradient(
+      colors: <Color>[Color(0xFF2B6CB0), Color(0xFF1E3A8A)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
+    TextSpan buildSpan() {
+      if (keywords.isEmpty) {
+        return TextSpan(
+          text: text,
+          style: GoogleFonts.dmSans(
+            color: textColor,
+            fontSize: 15,
+            height: 1.6,
+            fontWeight: FontWeight.w500,
+          ),
+        );
+      }
+
+      final spans = <TextSpan>[];
+      String remaining = text;
+
+      while (remaining.isNotEmpty) {
+        int index = remaining.length;
+        String? matchedKeyword;
+
+        for (final keyword in keywords) {
+          final current = remaining.toLowerCase().indexOf(
+            keyword.toLowerCase(),
+          );
+          if (current >= 0 && current < index) {
+            index = current;
+            matchedKeyword = remaining.substring(
+              current,
+              current + keyword.length,
+            );
+          }
+        }
+
+        if (index > 0) {
+          spans.add(
+            TextSpan(
+              text: remaining.substring(0, index),
+              style: GoogleFonts.dmSans(
+                color: textColor,
+                fontSize: 15,
+                height: 1.6,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          );
+        }
+
+        if (matchedKeyword != null) {
+          spans.add(
+            TextSpan(
+              text: matchedKeyword,
+              style: GoogleFonts.dmSans(
+                color: isUser
+                    ? const Color(0xFFFCD34D)
+                    : AppColors.lightPrimary,
+                fontSize: 15,
+                height: 1.6,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          );
+          remaining = remaining.substring(index + matchedKeyword.length);
+        } else {
+          break;
+        }
+      }
+
+      return TextSpan(children: spans);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
+        children: <Widget>[
+          if (!isUser) ...<Widget>[
+            CircleAvatar(
+              radius: 19,
+              backgroundColor: isDark
+                  ? const Color(0xFF24314E)
+                  : const Color(0xFFEAF2FF),
+              backgroundImage: botAvatar != null
+                  ? AssetImage(botAvatar!)
+                  : null,
+              child: botAvatar == null
+                  ? const Icon(
+                      Icons.auto_awesome,
+                      size: 16,
+                      color: Color(0xFF2563EB),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 8),
+          ],
+          Flexible(
+            child: Container(
+              constraints: BoxConstraints(maxWidth: maxWidth),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                gradient: isUser ? userGradient : null,
+                color: isUser ? null : botBubbleColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(18),
+                  topRight: const Radius.circular(18),
+                  bottomLeft: Radius.circular(isUser ? 18 : 6),
+                  bottomRight: Radius.circular(isUser ? 6 : 18),
+                ),
+                border: Border.all(
+                  color: isUser
+                      ? Colors.transparent
+                      : (isDark ? Colors.white24 : const Color(0xFFD8E3F6)),
+                ),
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.08),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: RichText(text: buildSpan()),
+            ),
+          ),
+          if (isUser) ...<Widget>[
+            const SizedBox(width: 8),
+            CircleAvatar(
+              radius: 19,
+              backgroundColor: isDark
+                  ? Colors.white12
+                  : const Color(0xFFEAF2FF),
+              backgroundImage: userAvatar != null
+                  ? NetworkImage(userAvatar!)
+                  : null,
+              child: userAvatar == null
+                  ? const Icon(Icons.person, size: 16, color: Color(0xFF2563EB))
+                  : null,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
