@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Test files
+cookies.txt
+*.test.js
+
+# Build
+dist/
+build/
+
+# Sensitive/important files
+service/config/firebaseServiceAccount.json
+service/config/firebase.js
+service/config/cloudinary.js
