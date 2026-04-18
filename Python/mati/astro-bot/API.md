@@ -1,0 +1,252 @@
+# API Documentation
+
+## Base URL
+```
+http://localhost:3000
+```
+
+## Endpoints
+
+### 1. Health Check
+
+**Endpoint:** `GET /health`
+
+**Response:**
+```json
+{
+  "ok": true,
+  "uptime": 3600
+}
+```
+
+---
+
+### 2. Chat
+
+**Endpoint:** `POST /api/chat`
+
+Send a message to AstroBot and get an AI-generated response.
+
+**Request Headers:**
+```
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "sessionId": "unique-session-id",
+  "message": "Your question here",
+  "userId": "optional-user-id",
+  "max_context_docs": 5
+}
+```
+
+**Required Fields:**
+- `sessionId` (string) - Unique identifier for the conversation session
+- `message` (string) - User's question
+
+**Optional Fields:**
+- `userId` (string) - User identifier for tracking
+- `max_context_docs` (number) - Not currently used (for future RAG implementation)
+
+**Response:**
+```json
+{
+  "ok": true,
+  "answer": "Saturn plays dual roles in both astrology and astronomy. In Vedic astrology, Saturn (Shani) represents discipline, karma, and life lessons. Scientifically, Saturn is the sixth planet from the Sun, a gas giant famous for its spectacular ring system.",
+  "citations": [],
+  "sources": [],
+  "rawModelResponse": {
+    "model": "gpt-4o-mini",
+    "usage": {
+      "prompt_tokens": 150,
+      "completion_tokens": 95,
+      "total_tokens": 245
+    }
+  }
+}
+```
+
+**Response Fields:**
+- `ok` (boolean) - Request status
+- `answer` (string) - AI-generated answer (3-6 sentences)
+- `citations` (array) - Document citations (currently empty)
+- `sources` (array) - Retrieved context sources (currently empty)
+- `rawModelResponse` (object) - Model metadata and token usage
+
+**Error Response:**
+```json
+{
+  "ok": false,
+  "error": "Error message description"
+}
+```
+
+**Status Codes:**
+- `200` - Success
+- `400` - Bad request (missing required fields)
+- `500` - Internal server error
+
+---
+
+## Example Requests
+
+### Using curl
+
+```bash
+curl -X POST http://localhost:3000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sessionId": "session-123",
+    "message": "What is the role of Saturn in astrology and astronomy?"
+  }'
+```
+
+### Using JavaScript (fetch)
+
+```javascript
+const response = await fetch('http://localhost:3000/api/chat', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    sessionId: 'session-123',
+    message: 'What is the role of Saturn in astrology and astronomy?',
+  }),
+});
+
+const data = await response.json();
+console.log(data.answer);
+```
+
+### Using Python (requests)
+
+```python
+import requests
+
+response = requests.post('http://localhost:3000/api/chat', json={
+    'sessionId': 'session-123',
+    'message': 'What is the role of Saturn in astrology and astronomy?'
+})
+
+data = response.json()
+print(data['answer'])
+```
+
+---
+
+## Example Questions
+
+### Indian Astrology
+- "What does it mean if my Moon is in Scorpio?"
+- "Give vastu tips for a north-facing home"
+- "Which gemstone suits a Leo ascendant?"
+- "What is Shani Dasha?"
+- "Explain Mangal Dosha"
+
+### Scientific Astronomy
+- "What is a black hole?"
+- "How far is Saturn from the Sun?"
+- "What are exoplanets?"
+- "Explain the Big Bang theory"
+- "What is a supernova?"
+
+### Mixed (Astrology + Astronomy)
+- "What is the role of Saturn in astrology and astronomy?"
+- "Tell me about Mars from both perspectives"
+- "What do planets mean in astrology vs astronomy?"
+
+---
+
+## Rate Limiting
+
+- **Window:** 15 minutes
+- **Max Requests:** 100 per IP address
+
+When rate limit is exceeded, you'll receive a `429 Too Many Requests` response.
+
+---
+
+## CORS
+
+CORS is enabled for all origins. In production, configure specific allowed origins in `src/server.js`.
+
+---
+
+## Session History
+
+Conversation history is automatically stored in `src/store/history.json` keyed by `sessionId`.
+
+**Format:**
+```json
+{
+  "session-123": [
+    {
+      "role": "user",
+      "content": "What is Saturn?",
+      "timestamp": "2025-11-12T10:30:00.000Z"
+    },
+    {
+      "role": "assistant",
+      "content": "Saturn is both...",
+      "timestamp": "2025-11-12T10:30:05.000Z"
+    }
+  ]
+}
+```
+
+---
+
+## Response Characteristics
+
+- **Length:** 3-6 sentences (concise and informative)
+- **Tone:** Balanced, positive, educational
+- **Style:** Simple language with relevant terminology
+- **Approach:** Insights and context, not predictions or guarantees
+- **Dual Expertise:** Covers both Indian astrology and scientific astronomy
+
+---
+
+## Error Handling
+
+Common errors and solutions:
+
+**Missing sessionId:**
+```json
+{
+  "ok": false,
+  "error": "sessionId is required"
+}
+```
+
+**Missing message:**
+```json
+{
+  "ok": false,
+  "error": "Message is required and must be a string"
+}
+```
+
+**Server error:**
+```json
+{
+  "ok": false,
+  "error": "Internal server error"
+}
+```
+
+---
+
+## Notes
+
+- Citations and sources arrays are currently empty (RAG/embeddings temporarily disabled)
+- Responses are generated by OpenAI's gpt-4o-mini model
+- Session history persists across server restarts
+- No authentication required (add in production)
+
+---
+
+**Version:** 3.0.0  
+**Last Updated:** November 12, 2025

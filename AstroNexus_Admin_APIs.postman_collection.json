@@ -1,0 +1,882 @@
+{
+  "info": {
+    "name": "AstroNexus Admin APIs",
+    "description": "Collection for admin APIs in AstroNexus",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://astronexus-backend.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Authentication",
+      "item": [
+        {
+          "name": "Create Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"adminpassword\",\n  \"setupKey\": \"your_setup_key\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/auth/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "auth", "create"]
+            }
+          }
+        },
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"adminpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('admin_token', response.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Admins",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/auth/all",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "auth", "all"]
+            }
+          }
+        },
+        {
+          "name": "Update Admin Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"oldpassword\",\n  \"newPassword\": \"newpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/auth/update-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "auth", "update-password"]
+            }
+          }
+        },
+        {
+          "name": "Admin Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Product Management",
+      "item": [
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gemstone Product\",\n  \"price\": 500,\n  \"category\": \"category_id\",\n  \"astrologyType\": \"gemstone\",\n  \"stock\": 10,\n  \"description\": \"Beautiful gemstone\",\n  \"isActive\": true,\n  \"deliveryType\": \"physical\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/products",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "products"]
+            }
+          }
+        },
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/products",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "products"]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Product\",\n  \"price\": 600\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/products/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "product_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Deactivate Product",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/products/:id/deactivate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "products", ":id", "deactivate"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "product_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/products/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "product_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "users"]
+            }
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New User\",\n  \"email\": \"newuser@example.com\",\n  \"phone\": \"+1234567890\",\n  \"password\": \"password123\",\n  \"role\": \"user\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "users"]
+            }
+          }
+        },
+        {
+          "name": "Block User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/users/:id/block",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "users", ":id", "block"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/users/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Order Management",
+      "item": [
+        {
+          "name": "Get All Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/orders/all",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "orders", "all"]
+            }
+          }
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Delivered\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/orders/:id/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "orders", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "order_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Order",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/orders/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "orders", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "order_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Category Management",
+      "item": [
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gemstones\",\n  \"description\": \"All gemstone products\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Category\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/categories/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "categories", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "category_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Toggle Category Active",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/categories/:id/toggle",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "categories", ":id", "toggle"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "category_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/categories/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "categories", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "category_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "CMS Management",
+      "item": [
+        {
+          "name": "Create CMS Content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"banner\",\n  \"title\": \"Welcome Banner\",\n  \"content\": \"Welcome to our site!\",\n  \"image\": \"banner_url\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/cms",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "cms"]
+            }
+          }
+        },
+        {
+          "name": "Get All CMS Content",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/cms",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "cms"]
+            }
+          }
+        },
+        {
+          "name": "Update CMS Content",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Banner\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/cms/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "cms", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "cms_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Feedback Management",
+      "item": [
+        {
+          "name": "Get All Feedbacks",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/feedback",
+              "host": ["{{base_url}}"],
+              "path": ["api", "feedback"]
+            }
+          }
+        },
+        {
+          "name": "Delete Feedback",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/feedback/:feedbackId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "feedback", ":feedbackId"],
+              "variable": [
+                { "key": "feedbackId", "value": "feedback_id_here" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Overview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "dashboard"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Astrology Service Management",
+      "item": [
+        {
+          "name": "Create Astrology Service",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kundli\",\n  \"key\": \"kundli\",\n  \"description\": \"Kundli generation service\",\n  \"enabled\": true,\n  \"isPremium\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/astrology-services",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "astrology-services"]
+            }
+          }
+        },
+        {
+          "name": "Get All Astrology Services",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/astrology-services",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "astrology-services"]
+            }
+          }
+        },
+        {
+          "name": "Get Astrology Service by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/astrology-services/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "astrology-services", ":id"],
+              "variable": [
+                { "key": "id", "value": "service_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Astrology Service",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Service\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/astrology-services/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "astrology-services", ":id"],
+              "variable": [
+                { "key": "id", "value": "service_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Astrology Service",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/astrology-services/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "astrology-services", ":id"],
+              "variable": [
+                { "key": "id", "value": "service_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Toggle Astrology Service",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enabled\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/astrology-services/:id/toggle",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "astrology-services", ":id", "toggle"],
+              "variable": [
+                { "key": "id", "value": "service_id_here" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Discount Management",
+      "item": [
+        {
+          "name": "Create Discount",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"NEWYEAR\",\n  \"percentage\": 10,\n  \"expiry\": \"2026-12-31T23:59:59Z\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/discount",
+              "host": ["{{base_url}}"],
+              "path": ["api", "discount"]
+            }
+          }
+        },
+        {
+          "name": "Get All Discounts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/discount",
+              "host": ["{{base_url}}"],
+              "path": ["api", "discount"]
+            }
+          }
+        },
+        {
+          "name": "Update Discount",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"percentage\": 15\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/discount/:discountId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "discount", ":discountId"],
+              "variable": [
+                {
+                  "key": "discountId",
+                  "value": "discount_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
