@@ -33,7 +33,10 @@ import adminUserRoutes from "./routes/admin/admin.user.routes.js";
 import feedbackRoutes from "./routes/feedback/feedback.js";
 import chatbotRoutes from "./routes/chatbot/chatbot.routes.js"
 import adminAstroRoutes from "./routes/admin/adminAstrologyRoutes.js";
+<<<<<<< HEAD
 import adminAstrologyServiceRoutes from "./routes/admin/admin.astrologyService.routes.js";
+=======
+>>>>>>> c2d8017703b006246cc66683ddebc7104d43c957
 import invoiceRoutes from "./routes/invoice/invoiceRoutes.js";
 import discountRoutes from "./routes/admin/discountRoutes.js";
 import unifiedRoutes from "./routes/unified/unified.routes.js";
@@ -118,7 +121,10 @@ app.use("/api/admin/categories", adminCategoryRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/tarot", tarotRoutes);
 app.use("/api/admin/astrology", adminAstroRoutes);
+<<<<<<< HEAD
 app.use("/api/admin/astrology-services", adminAstrologyServiceRoutes);
+=======
+>>>>>>> c2d8017703b006246cc66683ddebc7104d43c957
 
 // Mount discount routes under /discount
 app.use("/api/discount", discountRoutes);
