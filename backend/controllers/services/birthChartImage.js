@@ -36,6 +36,27 @@ const planetSymbols = {
   Pluto: "♇"
 };
 
+const normalizeBirthTime = (birthTime) => {
+  if (!birthTime || typeof birthTime !== "object") return birthTime;
+
+  const normalized = { ...birthTime };
+  const hourNum = Number(normalized.hour);
+  if (Number.isNaN(hourNum)) return normalized;
+
+  const hasAmPm = typeof normalized.ampm === "string" && normalized.ampm.trim();
+  if (hasAmPm) {
+    normalized.ampm = normalized.ampm.toLowerCase() === "pm" ? "pm" : "am";
+    if (hourNum === 0) normalized.hour = 12;
+    if (hourNum > 12) normalized.hour = hourNum - 12;
+    return normalized;
+  }
+
+  if (hourNum === 0) return { ...normalized, hour: 12, ampm: "am" };
+  if (hourNum === 12) return { ...normalized, hour: 12, ampm: "pm" };
+  if (hourNum > 12) return { ...normalized, hour: hourNum - 12, ampm: "pm" };
+  return { ...normalized, hour: hourNum, ampm: "am" };
+};
+
 // Helper: Generate chart image from chartData
 const generateChartImage = async (chartData) => {
   const H = {
@@ -79,7 +100,7 @@ const generateChartImage = async (chartData) => {
 
   // Draw houses, zodiac, planets
   Object.entries(H).forEach(([num, pos]) => {
-    const house = chartData.houses[num];
+    const house = chartData?.houses?.[num];
     if (!house) return;
 
     let y = pos.y - 40;
@@ -96,9 +117,10 @@ const generateChartImage = async (chartData) => {
     ctx.fillText(house.sign, pos.x, y);
 
     // Planets
-    if (house.planets.length) {
+    const planets = Array.isArray(house.planets) ? house.planets : [];
+    if (planets.length) {
       y += 30;
-      house.planets.forEach((p, i) => {
+      planets.forEach((p, i) => {
         const symbol = planetSymbols[p] || "•";
         ctx.fillStyle = planetColors[p] || "#000";
         ctx.font = "24px 'Segoe UI Symbol'";
@@ -136,14 +158,26 @@ const generateChartImage = async (chartData) => {
 exports.generateBirthChart = async (req, res) => {
   try {
     const body = req.body; // may or may not include userId
+    const payload = {
+      ...body,
+      birth_time: normalizeBirthTime(body?.birth_time)
+    };
 
     // Call Astro Nexus API
     const apiRes = await axios.post(
       "https://astronexus-live.onrender.com/api/unified/birth-chart",
-      body
+      payload
     );
 
-    const chartData = apiRes.data;
+    const chartData = apiRes?.data?.data || apiRes?.data;
+
+    if (!chartData || !chartData.houses) {
+      return res.status(502).json({
+        success: false,
+        message: "Chart generation failed",
+        error: "Invalid chart response from upstream service"
+      });
+    }
 
     // Generate chart image
     const chartImage = await generateChartImage(chartData);
@@ -153,12 +187,12 @@ exports.generateBirthChart = async (req, res) => {
 
     // Save chart (temporary if no userId)
     const saved = await BirthChart.create({
-      userId: body.userId || null,
-      ...body,
+      userId: payload.userId || null,
+      ...payload,
       chartImage,
       chartData,
       rashi,
-      isTemporary: !body.userId
+      isTemporary: !payload.userId
     });
 
     res.status(201).json({
@@ -167,7 +201,7 @@ exports.generateBirthChart = async (req, res) => {
       data: saved
     });
 
-    console.log("📂 Chart saved at:", filePath);
+    console.log("📂 Chart metadata saved in DB:", saved._id);
 
   } catch (err) {
     console.error(err.response?.data || err.message);
