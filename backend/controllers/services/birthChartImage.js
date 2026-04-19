@@ -4,39 +4,6 @@ const path = require("path");
 const { createCanvas } = require("canvas");
 const BirthChart = require("../../models/features/birthChartModel");
 
-const HTTP_TIMEOUT_MS = Number(process.env.UNIFIED_PROXY_TIMEOUT_MS || 45000);
-const client = axios.create({ timeout: HTTP_TIMEOUT_MS });
-
-const stripTrailingSlash = (value) => String(value).replace(/\/+$/, "");
-
-const getBirthChartServiceUrl = () => stripTrailingSlash(
-  process.env.BIRTH_CHART_SERVICE_URL || "http://127.0.0.1:8010"
-);
-
-const normalizeAxiosError = (error) => {
-  if (error.response) {
-    return {
-      statusCode: error.response.status || 502,
-      error: "Upstream birth chart service returned an error",
-      details: error.response.data,
-    };
-  }
-
-  if (error.request) {
-    return {
-      statusCode: 503,
-      error: "Upstream birth chart service is unreachable",
-      details: error.message,
-    };
-  }
-
-  return {
-    statusCode: 500,
-    error: "Unexpected birth chart wrapper failure",
-    details: error.message,
-  };
-};
-
 // 🌟 Planet colors
 const planetColors = {
   Sun: "#ff6600",
@@ -196,9 +163,13 @@ exports.generateBirthChart = async (req, res) => {
       birth_time: normalizeBirthTime(body?.birth_time)
     };
 
-    const serviceUrl = getBirthChartServiceUrl();
-    const apiRes = await client.post(`${serviceUrl}/api/v1/chart`, payload);
-    const chartData = apiRes?.data;
+    // Call Astro Nexus API
+    const apiRes = await axios.post(
+      "https://astronexus-live.onrender.com/api/unified/birth-chart",
+      payload
+    );
+
+    const chartData = apiRes?.data?.data || apiRes?.data;
 
     if (!chartData || !chartData.houses) {
       return res.status(502).json({
@@ -233,13 +204,11 @@ exports.generateBirthChart = async (req, res) => {
     console.log("📂 Chart metadata saved in DB:", saved._id);
 
   } catch (err) {
-    const normalized = normalizeAxiosError(err);
-    console.error(normalized.details || err.message);
-    res.status(normalized.statusCode).json({
+    console.error(err.response?.data || err.message);
+    res.status(500).json({
       success: false,
       message: "Chart generation failed",
-      error: normalized.error,
-      details: normalized.details
+      error: err.message
     });
   }
 };
