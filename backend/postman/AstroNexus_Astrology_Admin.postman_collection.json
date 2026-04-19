@@ -1,0 +1,498 @@
+{
+  "info": {
+    "name": "AstroNexus - Astrology + Unified + Admin",
+    "description": "Postman collection for user astrology signup flow, astrology services, unified wrapper APIs, and admin feature toggles/service management.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "5fd6f6f1-0f02-4c4d-aaf7-8e0d2de620de"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://astronexus-live.onrender.com" },
+    { "key": "userToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "sessionId", "value": "" },
+    { "key": "tempChartId", "value": "" },
+    { "key": "birthChartId", "value": "" },
+    { "key": "serviceId", "value": "" },
+    { "key": "featureKey", "value": "tarot" }
+  ],
+  "item": [
+    {
+      "name": "0. Auth Helpers",
+      "item": [
+        {
+          "name": "User Login (Email) - Save userToken/sessionId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let res = {};",
+                  "try { res = pm.response.json(); } catch (e) {}",
+                  "if (res.token) pm.collectionVariables.set('userToken', res.token);",
+                  "if (res.user && res.user.sessionId) pm.collectionVariables.set('sessionId', res.user.sessionId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"isha@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "login"]
+            }
+          }
+        },
+        {
+          "name": "Admin Login - Save adminToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let res = {};",
+                  "try { res = pm.response.json(); } catch (e) {}",
+                  "if (res.token) pm.collectionVariables.set('adminToken', res.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Astrology Signup Flow",
+      "item": [
+        {
+          "name": "Generate Birth Chart (sets temp chart in DB)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let res = {};",
+                  "try { res = pm.response.json(); } catch (e) {}",
+                  "const id = res?.data?._id || res?.data?.id;",
+                  "if (id) {",
+                  "  pm.collectionVariables.set('tempChartId', id);",
+                  "  pm.collectionVariables.set('birthChartId', id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Isha Verma\",\n  \"gender\": \"female\",\n  \"birth_date\": {\n    \"year\": 1996,\n    \"month\": 9,\n    \"day\": 12\n  },\n  \"birth_time\": {\n    \"hour\": 14,\n    \"minute\": 10,\n    \"ampm\": \"pm\"\n  },\n  \"place_of_birth\": \"Delhi, India\",\n  \"astrology_type\": \"vedic\",\n  \"ayanamsa\": \"lahiri\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/birthchart/generate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "birthchart", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Astrology Signup (uses tempChartId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let res = {};",
+                  "try { res = pm.response.json(); } catch (e) {}",
+                  "if (res.token) pm.collectionVariables.set('userToken', res.token);",
+                  "if (res.user && res.user.sessionId) pm.collectionVariables.set('sessionId', res.user.sessionId);",
+                  "if (res.user && res.user.birthChart && res.user.birthChart.id) pm.collectionVariables.set('birthChartId', res.user.birthChart.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Isha Verma\",\n  \"phone\": \"+919999999999\",\n  \"email\": \"isha@example.com\",\n  \"password\": \"password123\",\n  \"confirmPassword\": \"password123\",\n  \"dateOfBirth\": \"1996-09-12\",\n  \"timeOfBirth\": \"14:10\",\n  \"placeOfBirth\": \"Delhi, India\",\n  \"tempChartId\": \"{{tempChartId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/signup/astrology",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "signup", "astrology"]
+            }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{userToken}}", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/user/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Astrology Service APIs",
+      "item": [
+        {
+          "name": "Birth Chart Generate",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul\",\n  \"gender\": \"male\",\n  \"birth_date\": {\n    \"year\": 1992,\n    \"month\": 8,\n    \"day\": 21\n  },\n  \"birth_time\": {\n    \"hour\": 6,\n    \"minute\": 45,\n    \"ampm\": \"am\"\n  },\n  \"place_of_birth\": \"Mumbai, India\",\n  \"astrology_type\": \"vedic\",\n  \"ayanamsa\": \"lahiri\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/birthchart/generate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "birthchart", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Compatibility Ashtakoot Score",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"male\": {\n    \"year\": 1991,\n    \"month\": 7,\n    \"date\": 12,\n    \"hours\": 10,\n    \"minutes\": 30,\n    \"seconds\": 0,\n    \"latitude\": 28.6139,\n    \"longitude\": 77.2090,\n    \"timezone\": 5.5\n  },\n  \"female\": {\n    \"year\": 1993,\n    \"month\": 4,\n    \"date\": 21,\n    \"hours\": 15,\n    \"minutes\": 15,\n    \"seconds\": 0,\n    \"latitude\": 19.0760,\n    \"longitude\": 72.8777,\n    \"timezone\": 5.5\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compatibility/match-making/ashtakoot-score",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compatibility", "match-making", "ashtakoot-score"]
+            }
+          }
+        },
+        {
+          "name": "Horoscope Chart SVG",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"year\": 1996,\n  \"month\": 9,\n  \"date\": 12,\n  \"hours\": 14,\n  \"minutes\": 10,\n  \"seconds\": 0,\n  \"latitude\": 28.6139,\n  \"longitude\": 77.2090,\n  \"timezone\": 5.5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/horoscope/chart",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "horoscope", "chart"]
+            }
+          }
+        },
+        {
+          "name": "Tarot Random Cards (requires userToken)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{userToken}}", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tarot/random?n=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tarot", "random"],
+              "query": [
+                { "key": "n", "value": "3" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Unified Wrapper APIs",
+      "item": [
+        {
+          "name": "Unified Health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/unified/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "unified", "health"]
+            }
+          }
+        },
+        {
+          "name": "Unified Birth Chart",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Isha Verma\",\n  \"gender\": \"female\",\n  \"birth_date\": {\n    \"year\": 1996,\n    \"month\": 9,\n    \"day\": 12\n  },\n  \"birth_time\": {\n    \"hour\": 2,\n    \"minute\": 10,\n    \"ampm\": \"pm\"\n  },\n  \"place_of_birth\": \"Delhi, India\",\n  \"astrology_type\": \"vedic\",\n  \"ayanamsa\": \"lahiri\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/unified/birth-chart",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "unified", "birth-chart"]
+            }
+          }
+        },
+        {
+          "name": "Unified Horoscope",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/unified/horoscope?sign=leo&type=daily&day=TODAY",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "unified", "horoscope"],
+              "query": [
+                { "key": "sign", "value": "leo" },
+                { "key": "type", "value": "daily" },
+                { "key": "day", "value": "TODAY" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unified Mati Chat",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"{{sessionId}}\",\n  \"message\": \"My career prediction for this month\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/unified/mati-chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "unified", "mati-chat"]
+            }
+          }
+        },
+        {
+          "name": "Unified Aggregate",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"birthChart\": {\n    \"name\": \"Isha Verma\",\n    \"gender\": \"female\",\n    \"birth_date\": { \"year\": 1996, \"month\": 9, \"day\": 12 },\n    \"birth_time\": { \"hour\": 2, \"minute\": 10, \"ampm\": \"pm\" },\n    \"place_of_birth\": \"Delhi, India\",\n    \"astrology_type\": \"vedic\"\n  },\n  \"horoscope\": {\n    \"sign\": \"leo\",\n    \"type\": \"daily\",\n    \"day\": \"TODAY\"\n  },\n  \"matiChat\": {\n    \"sessionId\": \"{{sessionId}}\",\n    \"message\": \"How is today for finances?\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/unified/aggregate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "unified", "aggregate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Admin Feature Flags",
+      "item": [
+        {
+          "name": "Get Astrology Dashboard (features + usage)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/astrology/astro-dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "astrology", "astro-dashboard"]
+            }
+          }
+        },
+        {
+          "name": "Toggle Feature ON/OFF",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"{{featureKey}}\",\n  \"enabled\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/astrology/toggle-feature",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "astrology", "toggle-feature"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Admin Astrology Services (Protected)",
+      "item": [
+        {
+          "name": "Create Service",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tarot Reading\",\n  \"description\": \"3-card tarot guidance\",\n  \"price\": 299,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/astrology-services",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "astrology-services"]
+            }
+          }
+        },
+        {
+          "name": "Get All Services",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/astrology-services",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "astrology-services"]
+            }
+          }
+        },
+        {
+          "name": "Get Service By ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/astrology-services/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "astrology-services", "{{serviceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Service",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tarot Reading Premium\",\n  \"price\": 499,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/astrology-services/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "astrology-services", "{{serviceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Toggle Service",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/astrology-services/{{serviceId}}/toggle",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "astrology-services", "{{serviceId}}", "toggle"]
+            }
+          }
+        },
+        {
+          "name": "Delete Service",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/astrology-services/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "astrology-services", "{{serviceId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

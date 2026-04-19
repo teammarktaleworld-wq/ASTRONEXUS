@@ -62,9 +62,57 @@ const normalizeAxiosError = (service, error) => {
   };
 };
 
+const normalizeBirthTime = (birthTime) => {
+  if (!birthTime || typeof birthTime !== "object") return birthTime;
+
+  const normalized = { ...birthTime };
+  const hasAmPm = typeof normalized.ampm === "string" && normalized.ampm.trim();
+  const hourNum = Number(normalized.hour);
+
+  if (Number.isNaN(hourNum)) return normalized;
+
+  if (hasAmPm) {
+    normalized.ampm = normalized.ampm.toLowerCase() === "pm" ? "pm" : "am";
+    if (hourNum === 0) normalized.hour = 12;
+    if (hourNum > 12) normalized.hour = hourNum - 12;
+    return normalized;
+  }
+
+  if (hourNum === 0) {
+    normalized.hour = 12;
+    normalized.ampm = "am";
+    return normalized;
+  }
+
+  if (hourNum === 12) {
+    normalized.hour = 12;
+    normalized.ampm = "pm";
+    return normalized;
+  }
+
+  if (hourNum > 12) {
+    normalized.hour = hourNum - 12;
+    normalized.ampm = "pm";
+    return normalized;
+  }
+
+  normalized.hour = hourNum;
+  normalized.ampm = "am";
+  return normalized;
+};
+
+const normalizeBirthChartPayload = (payload) => {
+  if (!payload || typeof payload !== "object") return payload;
+  return {
+    ...payload,
+    birth_time: normalizeBirthTime(payload.birth_time),
+  };
+};
+
 const callBirthChartService = async (payload) => {
   const services = getServiceUrls();
-  const response = await client.post(`${services.birthChart}/api/v1/chart`, payload);
+  const normalizedPayload = normalizeBirthChartPayload(payload);
+  const response = await client.post(`${services.birthChart}/api/v1/chart`, normalizedPayload);
   return response.data;
 };
 
