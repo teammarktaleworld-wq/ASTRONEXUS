@@ -3,6 +3,7 @@ import "dart:math";
 
 import "package:astro_tale/core/constants/app_colors.dart";
 import "package:astro_tale/core/widgets/animated_app_background.dart";
+import "package:astro_tale/core/widgets/unified_dark_ui.dart";
 import "package:astro_tale/services/api_services/chatbot/chat_bot_services.dart";
 import "package:flutter/material.dart";
 import "package:google_fonts/google_fonts.dart";
@@ -152,29 +153,10 @@ class _MatiChatBotScreenState extends State<MatiChatBotScreen>
     final hasSuggestions = suggestions.isNotEmpty;
     final listBottomPadding =
         (hasSuggestions ? 158.0 : 98.0) + floatingBottomInset;
-    final isDark = theme.brightness == Brightness.dark;
-    final appBarColor = isDark
-        ? AppColors.appBarDark
-        : Colors.white.withValues(alpha: 0.94);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: appBarColor,
-        surfaceTintColor: Colors.transparent,
-        scrolledUnderElevation: 0,
-        elevation: 0.8,
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        title: Text(
-          "Mati AI",
-          style: GoogleFonts.dmSans(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: isDark ? AppColors.onDark : const Color(0xFF111827),
-          ),
-        ),
-      ),
+      appBar: UnifiedDarkUi.appBar(context, title: "Mati AI"),
       body: AnimatedAppBackground(
         child: Stack(
           children: <Widget>[

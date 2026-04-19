@@ -23,33 +23,34 @@ class SearchField extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final surface = isDark
+        ? const Color(0xFF1F2743).withValues(alpha: 0.88)
+        : Colors.white.withValues(alpha: 0.96);
+    final border = isDark
+        ? Colors.white.withValues(alpha: 0.14)
+        : colors.primary.withValues(alpha: 0.22);
+    final hint = isDark
+        ? Colors.white60
+        : colors.onSurface.withValues(alpha: 0.52);
+    final shadow = isDark
+        ? Colors.black.withValues(alpha: 0.28)
+        : Colors.black.withValues(alpha: 0.08);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: <Color>[
-                colors.surface.withOpacity(isDark ? 0.68 : 0.98),
-                colors.surface.withOpacity(isDark ? 0.56 : 0.92),
-              ],
-            ),
+            color: surface,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: isDark
-                  ? Colors.white.withOpacity(0.14)
-                  : colors.primary.withOpacity(0.16),
-            ),
+            border: Border.all(color: border),
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.25 : 0.08),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
+                color: shadow,
+                blurRadius: 14,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -63,16 +64,29 @@ class SearchField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: context.l10n.tr("searchProducts"),
               hintStyle: GoogleFonts.dmSans(
-                color: colors.onSurface.withOpacity(0.52),
+                color: hint,
                 fontWeight: FontWeight.w500,
               ),
               border: InputBorder.none,
-              icon: Icon(Icons.search_rounded, color: colors.primary, size: 22),
+              prefixIcon: Container(
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : colors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.search_rounded,
+                  color: colors.primary,
+                  size: 20,
+                ),
+              ),
               suffixIcon: isSearching
                   ? IconButton(
                       icon: Icon(
                         Icons.close_rounded,
-                        color: colors.onSurface.withOpacity(0.72),
+                        color: colors.onSurface.withValues(alpha: 0.72),
                       ),
                       onPressed: onClear,
                     )

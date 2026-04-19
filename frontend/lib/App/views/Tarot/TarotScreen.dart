@@ -66,15 +66,15 @@ class _TarotScreenState extends State<TarotScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final cardBackground = isDark
-        ? const Color(0xFF141829).withValues(alpha: 0.92)
-        : Colors.white.withValues(alpha: 0.92);
+        ? const Color(0xFF181A2B).withOpacity(0.98)
+        : Colors.white.withOpacity(0.98);
     final cardBorder = isDark
-        ? const Color(0xFFDBC33F).withValues(alpha: 0.35)
+        ? const Color(0xFFDBC33F).withOpacity(0.22)
         : const Color(0xFFD7E4F8);
     final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
     final subtitleColor = isDark ? Colors.white70 : const Color(0xFF64748B);
     final buttonColor = isDark
-        ? const Color(0xFF1C2A5A)
+        ? const Color(0xFF2B2F4A)
         : const Color(0xFF2563EB);
     final buttonBorderColor = isDark
         ? const Color(0xFFDBC33F)
@@ -91,93 +91,126 @@ class _TarotScreenState extends State<TarotScreen> {
             SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 28),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: cardBackground,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: cardBorder, width: 1.3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: isDark
-                            ? Colors.black.withValues(alpha: 0.5)
-                            : const Color(0xFF9AADD0).withValues(alpha: 0.22),
-                        blurRadius: 20,
-                        offset: const Offset(0, 12),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isSmall = constraints.maxWidth < 400;
+                    return Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isSmall ? 12 : 24,
+                        vertical: isSmall ? 16 : 28,
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Let the Cards Speak',
-                        style: GoogleFonts.dmSans(
-                          color: titleColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Enter your name and choose how many cards to reveal.',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.dmSans(
-                          color: subtitleColor,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      _inputField(
-                        label: 'Your Name',
-                        icon: Icons.person_outline,
-                        controller: nameController,
-                      ),
-                      const SizedBox(height: 16),
-                      _inputField(
-                        label: 'Number of Cards (1-78)',
-                        icon: Icons.auto_awesome,
-                        controller: countController,
-                        keyboardType: TextInputType.number,
-                      ),
-                      const SizedBox(height: 28),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton(
-                          onPressed: isLoading ? null : _generateTarot,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: buttonColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              side: BorderSide(
-                                color: buttonBorderColor,
-                                width: 1.4,
+                      decoration: BoxDecoration(
+                        gradient: isDark
+                            ? LinearGradient(
+                                colors: [
+                                  const Color(0xFF181A2B),
+                                  const Color(0xFF23264A).withOpacity(0.98),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              )
+                            : LinearGradient(
+                                colors: [
+                                  Colors.white.withOpacity(0.98),
+                                  const Color(0xFFE3E8F7).withOpacity(0.98),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
-                            ),
-                            elevation: 8,
-                            shadowColor: Colors.black.withValues(alpha: 0.34),
+                        borderRadius: BorderRadius.circular(isSmall ? 18 : 26),
+                        border: Border.all(color: cardBorder, width: 1.2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDark
+                                ? Colors.black.withOpacity(0.45)
+                                : const Color(0xFF9AADD0).withOpacity(0.13),
+                            blurRadius: 18,
+                            offset: const Offset(0, 10),
                           ),
-                          child: isLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            'Let the Cards Speak',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.dmSans(
+                              color: titleColor,
+                              fontSize: isSmall ? 17 : 22,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Enter your name and choose how many cards to reveal.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.dmSans(
+                              color: subtitleColor,
+                              fontSize: isSmall ? 12 : 14,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _inputField(
+                            label: 'Your Name',
+                            icon: Icons.person_outline,
+                            controller: nameController,
+                          ),
+                          const SizedBox(height: 16),
+                          _inputField(
+                            label: 'Number of Cards (1-78)',
+                            icon: Icons.auto_awesome,
+                            controller: countController,
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 28),
+                          SizedBox(
+                            width: double.infinity,
+                            height: isSmall ? 46 : 54,
+                            child: ElevatedButton(
+                              onPressed: isLoading ? null : _generateTarot,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: buttonColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    isSmall ? 12 : 18,
                                   ),
-                                )
-                              : Text(
-                                  'Reveal My Cards',
-                                  style: GoogleFonts.dmSans(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                  side: BorderSide(
+                                    color: buttonBorderColor,
+                                    width: 1.3,
                                   ),
                                 ),
-                        ),
+                                elevation: 10,
+                                shadowColor: Colors.black.withOpacity(0.22),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isSmall ? 10 : 16,
+                                ),
+                              ),
+                              child: isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Reveal My Cards',
+                                      style: GoogleFonts.dmSans(
+                                        fontSize: isSmall ? 15 : 17,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        letterSpacing: 0.2,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -232,18 +265,28 @@ class _TarotScreenState extends State<TarotScreen> {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final fillColor = isDark
-        ? Colors.white.withValues(alpha: 0.12)
-        : Colors.white.withValues(alpha: 0.97);
-    final borderColor = isDark ? Colors.white24 : const Color(0xFFD7E3F7);
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final hintColor = isDark ? Colors.white54 : const Color(0xFF64748B);
-    final iconColor = isDark ? const Color(0xFFDBC33F) : const Color(0xFF2563EB);
+        ? Colors.white.withOpacity(
+            0.92,
+          ) // much lighter, white-like for dark mode
+        : Colors.white.withOpacity(0.97);
+    final borderColor = isDark
+        ? const Color(0xFFE0E3EA) // soft light border for dark mode
+        : const Color(0xFFD7E3F7);
+    final textColor = isDark
+        ? const Color(0xFF23264A) // dark text for white-like field in dark mode
+        : const Color(0xFF0F172A);
+    final hintColor = isDark
+        ? const Color(0xFF6B7280) // subtle dark hint
+        : const Color(0xFF64748B);
+    final iconColor = isDark
+        ? const Color(0xFF8B7CF6) // soft accent for icon in dark mode
+        : const Color(0xFF2563EB);
 
     return Container(
       decoration: BoxDecoration(
         color: fillColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor),
+        border: Border.all(color: borderColor, width: 1.2),
       ),
       child: TextField(
         controller: controller,

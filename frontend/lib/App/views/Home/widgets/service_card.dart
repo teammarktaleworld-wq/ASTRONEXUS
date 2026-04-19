@@ -22,9 +22,8 @@ class ServiceData {
 
 class ServiceCard extends StatelessWidget {
   final ServiceData data;
-  final bool isPremium;
-
-  const ServiceCard({required this.data, this.isPremium = false, super.key});
+  // Removed isPremium for open features
+  const ServiceCard({required this.data, super.key, required bool isPremium});
 
   @override
   Widget build(BuildContext context) {
@@ -35,16 +34,7 @@ class ServiceCard extends StatelessWidget {
     final subtitleColor = Colors.white70;
 
     return InkWell(
-      onTap: () {
-        if (isPremium) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => SubscriptionPage()),
-          );
-        } else {
-          data.onTap();
-        }
-      },
+      onTap: data.onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.all(14),
@@ -115,20 +105,7 @@ class ServiceCard extends StatelessWidget {
               ],
             ),
 
-            // Premium lock
-            if (isPremium)
-              Positioned(
-                top: 4,
-                right: 4,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.lock, color: Colors.white, size: 16),
-                ),
-              ),
+            // No premium lock for open features
           ],
         ),
       ),

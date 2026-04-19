@@ -4,6 +4,7 @@ import 'package:astro_tale/core/constants/app_colors.dart';
 import 'package:astro_tale/core/localization/app_localizations.dart';
 import 'package:astro_tale/core/theme/app_gradients.dart';
 import 'package:astro_tale/core/widgets/animated_app_background.dart';
+import 'package:astro_tale/core/widgets/unified_dark_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -45,27 +46,10 @@ class _ServiceScreenState extends State<ServiceScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: isDark
-            ? AppColors.appBarDark
-            : AppColors.lightContainer,
-        surfaceTintColor: Colors.transparent,
-        scrolledUnderElevation: 0,
-        elevation: 0.6,
-        centerTitle: true,
-        title: Text(
-          context.l10n.tr("services"),
-          style: GoogleFonts.dmSans(
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-            color: AppColors.onDark,
-          ),
-        ),
-      ),
+      appBar: UnifiedDarkUi.appBar(context, title: context.l10n.tr("services")),
       body: AnimatedAppBackground(
         child: Stack(
           children: [

@@ -20,6 +20,7 @@ import 'package:astro_tale/core/constants/app_colors.dart';
 import 'package:astro_tale/core/localization/app_localizations.dart';
 import 'package:astro_tale/core/settings/app_settings_controller.dart';
 import 'package:astro_tale/core/widgets/animated_app_background.dart';
+import 'package:astro_tale/core/widgets/unified_dark_ui.dart';
 import 'package:astro_tale/helper/Astrology_flow_helper.dart';
 import 'package:astro_tale/ui_componets/glass/glass_card.dart';
 import 'package:astro_tale/util/images.dart';
@@ -274,7 +275,39 @@ class _HomescreenState extends State<Homescreen> with TickerProviderStateMixin {
 
       backgroundColor: theme.scaffoldBackgroundColor,
 
-      appBar: _homeAppBar(context, userName, userAvatar),
+      appBar: UnifiedDarkUi.appBar(
+        context,
+        title: context.l10n.tr("home"),
+        centerTitle: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) {
+                    return NotificationScreen(token: AuthController.token);
+                  },
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.money),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) {
+                    return SubscriptionPage();
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
 
       body: AnimatedAppBackground(
         child: Stack(
@@ -986,16 +1019,17 @@ class _HomescreenState extends State<Homescreen> with TickerProviderStateMixin {
           MaterialPageRoute(builder: (_) => SplashHoroscope()),
         ),
       ),
-      // ServiceData(
-      //   title: "Love",
-      //   description: "Matchmaking & compatibility",
-      //   asset: "assets/icons/love12.png",
-      //   color: Colors.pinkAccent,
-      //   onTap: () => Navigator.push(
-      //     context,
-      //     MaterialPageRoute(builder: (_) => SplashMatch()),
-      //   ),
-      // ),
+      ServiceData(
+        title: "Match",
+        description:
+            "Compatibility analysis based on planetary harmony, emotions, and future potential.",
+        asset: "assets/icons/love12.png",
+        color: Colors.pinkAccent,
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => SplashMatch()),
+        ),
+      ),
       ServiceData(
         title: "Birth Chart",
         description: "Your complete kundli",

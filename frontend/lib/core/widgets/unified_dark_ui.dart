@@ -11,26 +11,35 @@ class UnifiedDarkUi {
     List<Widget>? actions,
     bool centerTitle = true,
   }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final background = isDark ? AppColors.appBarDark : AppColors.lightContainer;
+    final foreground = isDark ? AppColors.onDark : AppColors.lightTextPrimary;
+
     return AppBar(
-      backgroundColor: AppColors.appBarDark,
+      backgroundColor: background,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
+      scrolledUnderElevation: 0,
       centerTitle: centerTitle,
       title: Text(
         title,
         style: GoogleFonts.dmSans(
-          color: AppColors.onDark,
+          color: foreground,
           fontWeight: FontWeight.w700,
           fontSize: 20,
           letterSpacing: 0.3,
         ),
       ),
-      iconTheme: const IconThemeData(color: AppColors.onDark),
-      actionsIconTheme: const IconThemeData(color: AppColors.onDark),
+      iconTheme: IconThemeData(color: foreground),
+      actionsIconTheme: IconThemeData(color: foreground),
       actions: actions,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
-        child: Container(height: 1, color: Colors.white.withOpacity(0.06)),
+        child: Container(
+          height: 1,
+          color: foreground.withValues(alpha: isDark ? 0.08 : 0.12),
+        ),
       ),
     );
   }

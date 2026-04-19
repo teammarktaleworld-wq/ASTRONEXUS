@@ -1,4 +1,5 @@
 // language: dart
+import 'dart:async';
 import 'dart:ui';
 import 'package:astro_tale/App/Model/cart_model.dart';
 import 'package:astro_tale/App/Model/product_model.dart';
@@ -29,6 +30,9 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   final ApiService _apiService = ApiService();
   final CartApi _cartApi = CartApi();
+  final PageController _imagePageController = PageController(
+    viewportFraction: 0.97,
+  );
 
   // typed keys so we can call \`loadFeedbacks()\` safely
   final GlobalKey<FeedbackScreenState> feedbackListKey =
@@ -40,12 +44,40 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   CartModel? cart;
   bool loading = true;
   int cartCount = 0;
+  int _activeImageIndex = 0;
+  Timer? _imageAutoScrollTimer;
 
   @override
   void initState() {
     super.initState();
     _fetchProduct();
     _loadCart();
+  }
+
+  void _startImageAutoScroll(int imageCount) {
+    _imageAutoScrollTimer?.cancel();
+    if (imageCount <= 1) return;
+
+    _imageAutoScrollTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted || !_imagePageController.hasClients) return;
+      final next = (_activeImageIndex + 1) % imageCount;
+      _imagePageController.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  void _pauseImageAutoScroll() {
+    _imageAutoScrollTimer?.cancel();
+  }
+
+  void _resumeImageAutoScroll() {
+    final imageCount = (product?.images.isNotEmpty ?? false)
+        ? product!.images.length
+        : 1;
+    _startImageAutoScroll(imageCount);
   }
 
   // ================= FETCH CART =================
@@ -73,11 +105,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         widget.productId.trim(),
       );
 
+      final imageCount = fetchedProduct.images.isNotEmpty
+          ? fetchedProduct.images.length
+          : 1;
+
       if (mounted) {
         setState(() {
           product = fetchedProduct;
           loading = false;
+          _activeImageIndex = 0;
         });
+        _startImageAutoScroll(imageCount);
       }
     } catch (e) {
       debugPrint("Fetch error: $e");
@@ -233,7 +271,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Customer Reviews",
@@ -310,118 +349,128 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         ? product!.images
         : ["https://via.placeholder.com/400"];
 
-    final PageController controller = PageController(viewportFraction: 0.97);
-    int activeIndex = 0;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final sliderWidth = constraints.maxWidth;
+        final sliderHeight = (sliderWidth * 0.86).clamp(240.0, 360.0);
+        final imageHeight = sliderHeight - 40;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white24, width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 14,
-            offset: const Offset(0, 8),
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white24, width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 14,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-        ],
-      ),
-      height: 320, // total height including dots
-      width: double.infinity,
-      child: StatefulBuilder(
-        builder: (context, setState) {
-          controller.addListener(() {
-            final newIndex = (controller.page ?? 0).round();
-            if (newIndex != activeIndex) {
-              setState(() => activeIndex = newIndex);
-            }
-          });
-
-          return Column(
+          height: sliderHeight,
+          width: double.infinity,
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Image slider
               SizedBox(
-                height: 280,
-                child: PageView.builder(
-                  controller: controller,
-                  itemCount: images.length,
-                  itemBuilder: (context, i) {
-                    return AnimatedBuilder(
-                      animation: controller,
-                      builder: (context, child) {
-                        double value = 1.0;
-                        if (controller.position.haveDimensions) {
-                          value = controller.page! - i;
-                          value = (1 - (value.abs() * 0.15)).clamp(0.85, 1.0);
-                        }
-                        return Center(
-                          child: Transform.scale(
-                            scale: value,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 14,
-                                        offset: const Offset(0, 8),
-                                      ),
-                                    ],
-                                  ),
-                                  child: AspectRatio(
-                                    aspectRatio:
-                                        4 / 3, // better image proportion
-                                    child: Image.network(
-                                      images[i],
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Container(
-                                        color: Colors.white10,
-                                        child: const Icon(
-                                          Icons.image_not_supported,
-                                          size: 60,
+                height: imageHeight,
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (notification) {
+                    if (notification is ScrollStartNotification &&
+                        notification.dragDetails != null) {
+                      _pauseImageAutoScroll();
+                    }
+                    if (notification is ScrollEndNotification) {
+                      _resumeImageAutoScroll();
+                    }
+                    return false;
+                  },
+                  child: PageView.builder(
+                    controller: _imagePageController,
+                    itemCount: images.length,
+                    onPageChanged: (index) {
+                      if (!mounted) return;
+                      setState(() => _activeImageIndex = index);
+                    },
+                    itemBuilder: (context, i) {
+                      return AnimatedBuilder(
+                        animation: _imagePageController,
+                        builder: (context, child) {
+                          double value = 1.0;
+                          if (_imagePageController.hasClients &&
+                              _imagePageController.position.haveDimensions) {
+                            final page =
+                                _imagePageController.page ??
+                                _imagePageController.initialPage.toDouble();
+                            value = page - i;
+                            value = (1 - (value.abs() * 0.15)).clamp(0.85, 1.0);
+                          }
+
+                          return Center(
+                            child: Transform.scale(
+                              scale: value,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 14,
+                                          offset: const Offset(0, 8),
                                         ),
-                                      ),
-                                      loadingBuilder: (context, child, progress) {
-                                        if (progress == null) return child;
-                                        return Center(
-                                          child: CircularProgressIndicator(
-                                            value:
-                                                progress.expectedTotalBytes !=
-                                                    null
-                                                ? progress.cumulativeBytesLoaded /
-                                                      progress
-                                                          .expectedTotalBytes!
-                                                : null,
+                                      ],
+                                    ),
+                                    child: AspectRatio(
+                                      aspectRatio: 4 / 3,
+                                      child: Image.network(
+                                        images[i],
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(
+                                          color: Colors.white10,
+                                          child: const Icon(
+                                            Icons.image_not_supported,
+                                            size: 60,
                                           ),
-                                        );
-                                      },
+                                        ),
+                                        loadingBuilder: (context, child, progress) {
+                                          if (progress == null) return child;
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              value:
+                                                  progress.expectedTotalBytes !=
+                                                      null
+                                                  ? progress.cumulativeBytesLoaded /
+                                                        progress
+                                                            .expectedTotalBytes!
+                                                  : null,
+                                            ),
+                                          );
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  },
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
-
               const SizedBox(height: 12),
-
-              // Dots indicator
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(images.length, (index) {
-                  final isActive = index == activeIndex;
+                  final isActive = index == _activeImageIndex;
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -435,10 +484,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 }),
               ),
             ],
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
+  }
+
+  @override
+  void dispose() {
+    _imageAutoScrollTimer?.cancel();
+    _imagePageController.dispose();
+    super.dispose();
   }
 
   Widget _infoCard() {

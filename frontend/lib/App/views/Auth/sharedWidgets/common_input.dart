@@ -35,6 +35,7 @@ class CommonInput extends StatelessWidget {
       onChanged: onChanged,
       keyboardType: keyboardType,
       obscureText: obscureText,
+      scrollPadding: const EdgeInsets.only(bottom: 180),
       cursorColor: iconColor,
       style: GoogleFonts.dmSans(color: textColor, fontWeight: FontWeight.w500),
       decoration: InputDecoration(

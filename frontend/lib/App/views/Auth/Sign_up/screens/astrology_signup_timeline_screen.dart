@@ -283,10 +283,9 @@ class _AstrologySignupTimelineState extends State<AstrologySignupTimeline> {
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final l10n = context.l10n;
-    final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.transparent,
       appBar: SignupAppBar(step: step, onBack: previousStep),
       body: Stack(
@@ -308,12 +307,8 @@ class _AstrologySignupTimelineState extends State<AstrologySignupTimeline> {
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () => FocusScope.of(context).unfocus(),
-            child: AnimatedPadding(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOutCubic,
-              padding: EdgeInsets.only(
-                bottom: keyboardInset > 0 ? keyboardInset : 0,
-              ),
+            child: SafeArea(
+              bottom: false,
               child: Column(
                 children: [
                   const SizedBox(height: 14),

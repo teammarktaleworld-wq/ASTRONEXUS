@@ -2,40 +2,39 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../Model/product_model.dart';
-<<<<<<< HEAD
 
-String astrologyLabel(AstrologyType type) {
-  switch (type) {
-    case AstrologyType.gemstone:
-      return 'Gemstone';
-    case AstrologyType.pooja:
-      return 'Pooja';
-    case AstrologyType.report:
-      return 'Report';
-    case AstrologyType.consultation:
-      return 'Consultation';
-  }
-}
 
-String deliveryLabel(DeliveryType type) {
-  switch (type) {
-    case DeliveryType.physical:
-      return 'Physical';
-    case DeliveryType.digital:
-      return 'Digital';
-  }
-}
 
-String stockLabel(int stock) {
-  return stock > 0 ? 'In Stock' : 'Out of Stock';
-}
-=======
-import '../helper/ product_helpers.dart';
->>>>>>> c2d8017703b006246cc66683ddebc7104d43c957
 
 class ProductInfoCard extends StatelessWidget {
   final ProductModel product;
   const ProductInfoCard({super.key, required this.product});
+
+  String astrologyLabel(AstrologyType type) {
+    switch (type) {
+      case AstrologyType.gemstone:
+        return 'Gemstone';
+      case AstrologyType.pooja:
+        return 'Pooja';
+      case AstrologyType.report:
+        return 'Report';
+      case AstrologyType.consultation:
+        return 'Consultation';
+    }
+  }
+
+  String deliveryLabel(DeliveryType type) {
+    switch (type) {
+      case DeliveryType.physical:
+        return 'Physical';
+      case DeliveryType.digital:
+        return 'Digital';
+    }
+  }
+
+  String stockLabel(int stock) {
+    return stock > 0 ? 'In Stock' : 'Out of Stock';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,11 +92,7 @@ class ProductInfoCard extends StatelessWidget {
 
   Widget _chip(String label, {Color color = Colors.blueAccent}) {
     return Chip(
-<<<<<<< HEAD
       backgroundColor: color.withValues(alpha: 0.2),
-=======
-      backgroundColor: color.withOpacity(.2),
->>>>>>> c2d8017703b006246cc66683ddebc7104d43c957
       label: Text(label, style: TextStyle(color: color)),
     );
   }

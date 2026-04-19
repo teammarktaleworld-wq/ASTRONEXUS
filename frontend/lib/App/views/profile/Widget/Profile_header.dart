@@ -124,33 +124,53 @@ class ProfileHeaderCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            userName.isEmpty ? "Guest" : userName,
-            style: GoogleFonts.dmSans(
-              color: titleColor,
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
+          if (userName.isNotEmpty)
+            Text(
+              userName,
+              style: GoogleFonts.dmSans(
+                color: titleColor,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
+          if (userName.isEmpty)
+            Text(
+              "Guest",
+              style: GoogleFonts.dmSans(
+                color: mutedColor,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           if (email.isNotEmpty)
-            Text(
-              email,
-              style: GoogleFonts.dmSans(color: mutedColor, fontSize: 14),
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                email,
+                style: GoogleFonts.dmSans(color: mutedColor, fontSize: 14),
+              ),
             ),
-          const SizedBox(height: 6),
           if (phone.isNotEmpty)
-            Text(
-              phone,
-              style: GoogleFonts.dmSans(color: mutedColor, fontSize: 14),
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                phone,
+                style: GoogleFonts.dmSans(color: mutedColor, fontSize: 14),
+              ),
             ),
-          const SizedBox(height: 12),
           if (zodiacSign.isNotEmpty)
-            _infoChip(
-              "Rashi: ${zodiacSign.toUpperCase()}",
-              Colors.white.withValues(alpha: 0.12),
-              Colors.white24,
-              titleColor,
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: _infoChip(
+                "Rashi: ${zodiacSign.toUpperCase()}",
+                theme.brightness == Brightness.dark
+                    ? Colors.white.withOpacity(0.08)
+                    : Colors.black.withOpacity(0.04),
+                theme.brightness == Brightness.dark
+                    ? Colors.white24
+                    : Colors.black12,
+                titleColor,
+              ),
             ),
         ],
       ),

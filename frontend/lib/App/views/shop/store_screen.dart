@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:astro_tale/App/views/shop/widgets/category_chip.dart';
-import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart'; // <-- skeleton import
+import 'package:shimmer/shimmer.dart';
 
 import '../../../services/api_services/cart_api.dart';
 import '../../../services/api_services/store_api.dart';
@@ -45,6 +45,41 @@ class _StoreScreenState extends State<StoreScreen> {
   List<CategoryModel> categories = [];
 
   int selectedCategoryIndex = 0;
+
+  Color _shimmerBase(ThemeData theme) {
+    final isDark = theme.brightness == Brightness.dark;
+    return isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : Colors.white.withValues(alpha: 0.72);
+  }
+
+  Color _shimmerHighlight(ThemeData theme) {
+    return Colors.white;
+  }
+
+  Widget _shimmerBlock({
+    required double width,
+    required double height,
+    required double radius,
+    EdgeInsetsGeometry margin = EdgeInsets.zero,
+  }) {
+    final theme = Theme.of(context);
+
+    return Shimmer.fromColors(
+      baseColor: _shimmerBase(theme),
+      highlightColor: _shimmerHighlight(theme),
+      period: const Duration(milliseconds: 1100),
+      child: Container(
+        width: width,
+        height: height,
+        margin: margin,
+        decoration: BoxDecoration(
+          color: _shimmerBase(theme),
+          borderRadius: BorderRadius.circular(radius),
+        ),
+      ),
+    );
+  }
 
   // ================= BANNER ANIMATION =================
   final PageController _bannerController = PageController();
@@ -245,17 +280,10 @@ class _StoreScreenState extends State<StoreScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 loading
-                    ? SkeletonItem(
-                        child: SkeletonParagraph(
-                          style: SkeletonParagraphStyle(
-                            lines: 1,
-                            spacing: 12,
-                            lineStyle: SkeletonLineStyle(
-                              height: 160,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                        ),
+                    ? _shimmerBlock(
+                        width: double.infinity,
+                        height: 160,
+                        radius: 16,
                       )
                     : _bannerSlider(),
                 const SizedBox(height: 16),
@@ -347,15 +375,8 @@ class _StoreScreenState extends State<StoreScreen> {
         scrollDirection: Axis.horizontal,
         itemCount: 5,
         separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (_, __) => SkeletonItem(
-          child: SkeletonLine(
-            style: SkeletonLineStyle(
-              width: 80,
-              height: 40,
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-        ),
+        itemBuilder: (_, __) =>
+            _shimmerBlock(width: 80, height: 40, radius: 20),
       ),
     );
   }
@@ -410,35 +431,15 @@ class _StoreScreenState extends State<StoreScreen> {
           mainAxisSpacing: 16,
         ),
         itemCount: 4,
-        itemBuilder: (_, __) => SkeletonItem(
-
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SkeletonLine(
-                style: SkeletonLineStyle(
-                  height: 180,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              const SizedBox(height: 10),
-              SkeletonLine(
-                style: SkeletonLineStyle(
-                  height: 16,
-                  width: 120,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              const SizedBox(height: 6),
-              SkeletonLine(
-                style: SkeletonLineStyle(
-                  height: 14,
-                  width: 60,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ],
-          ),
+        itemBuilder: (_, __) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _shimmerBlock(width: double.infinity, height: 180, radius: 20),
+            const SizedBox(height: 10),
+            _shimmerBlock(width: 120, height: 16, radius: 8),
+            const SizedBox(height: 6),
+            _shimmerBlock(width: 60, height: 14, radius: 8),
+          ],
         ),
       );
     }

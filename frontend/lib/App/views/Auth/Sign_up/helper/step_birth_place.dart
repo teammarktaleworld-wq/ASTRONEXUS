@@ -37,6 +37,7 @@ class StepBirthPlace extends StatelessWidget {
         TextField(
           controller: controller,
           readOnly: true,
+          scrollPadding: const EdgeInsets.only(bottom: 180),
           cursorColor: iconColor,
           onTap: () async {
             final selected = await showPlaceSuggestionSheet(

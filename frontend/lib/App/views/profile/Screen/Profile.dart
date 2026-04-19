@@ -1,11 +1,10 @@
 import 'dart:io';
-import 'package:astro_tale/core/constants/app_colors.dart';
 import 'package:astro_tale/core/localization/app_localizations.dart';
 import 'package:astro_tale/core/widgets/animated_app_background.dart';
 import 'package:astro_tale/core/widgets/themed_shimmer.dart';
+import 'package:astro_tale/core/widgets/unified_dark_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -256,7 +255,7 @@ class _CosmicProfileScreenState extends State<CosmicProfileScreen> {
     final l10n = context.l10n;
 
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: UnifiedDarkUi.appBar(context, title: context.l10n.tr("profile")),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: AnimatedAppBackground(
         child: SafeArea(
@@ -286,27 +285,6 @@ class _CosmicProfileScreenState extends State<CosmicProfileScreen> {
                     const SizedBox(height: 120),
                   ],
                 ),
-        ),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: Theme.of(context).brightness == Brightness.dark
-          ? AppColors.lightContainerAlt
-          : AppColors.background,
-      surfaceTintColor: Colors.transparent,
-      scrolledUnderElevation: 0,
-      elevation: 0,
-      automaticallyImplyLeading: false,
-      centerTitle: true,
-      title: Text(
-        context.l10n.tr("profile"),
-        style: GoogleFonts.dmSans(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
         ),
       ),
     );

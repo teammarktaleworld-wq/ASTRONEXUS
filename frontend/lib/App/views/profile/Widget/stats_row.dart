@@ -14,8 +14,8 @@ class StatsRow extends StatefulWidget {
 class _StatsRowState extends State<StatsRow> {
   int planetCount = 0;
   int houseCount = 0;
-  int reportsCount = 0; // Placeholder, can be fetched from API
-  int chatsCount = 0; // Placeholder, can be fetched from API
+  int reportsCount = 0;
+  int chatsCount = 0;
 
   @override
   void initState() {
@@ -25,15 +25,11 @@ class _StatsRowState extends State<StatsRow> {
 
   Future<void> _loadStats() async {
     final prefs = await SharedPreferences.getInstance();
-
     setState(() {
-      // Load planets & houses count from SharedPreferences
       planetCount = prefs.getInt("planetCount") ?? 0;
       houseCount = prefs.getInt("houseCount") ?? 0;
-
-      // TODO: Replace with real API/fetch if you have reports & chats counts
-      reportsCount = 12;
-      chatsCount = 8;
+      reportsCount = prefs.getInt("reportsCount") ?? 0;
+      chatsCount = prefs.getInt("chatsCount") ?? 0;
     });
   }
 
@@ -51,22 +47,22 @@ class _StatsRowState extends State<StatsRow> {
     final stats = [
       {
         "label": "Kundli",
-        "value": planetCount.toString(),
+        "value": planetCount > 0 ? planetCount.toString() : "-",
         "icon": LucideIcons.star,
       },
       {
         "label": "Houses",
-        "value": houseCount.toString(),
+        "value": houseCount > 0 ? houseCount.toString() : "-",
         "icon": LucideIcons.layoutDashboard,
       },
       {
         "label": "Reports",
-        "value": reportsCount.toString(),
+        "value": reportsCount > 0 ? reportsCount.toString() : "-",
         "icon": LucideIcons.file,
       },
       {
         "label": "Chats",
-        "value": chatsCount.toString(),
+        "value": chatsCount > 0 ? chatsCount.toString() : "-",
         "icon": LucideIcons.messageCircle,
       },
     ];
