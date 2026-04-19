@@ -7,6 +7,16 @@ import upload from "../../middlewares/upload.js";
 import { authenticateToken } from "../../middlewares/auth.js";
 import BirthChart from "../../models/features/birthChartModel.js";
 
+const normalizeChartId = (value) => {
+  if (!value) return null;
+  if (typeof value === "string") return value.trim() || null;
+  if (typeof value === "object") {
+    if (typeof value._id === "string") return value._id.trim() || null;
+    if (typeof value.id === "string") return value.id.trim() || null;
+  }
+  return null;
+};
+
 
 /* ======================================================
    1️⃣ BASIC SIGNUP
@@ -78,8 +88,16 @@ export async function handleAstrologySignup(req, res) {
       dateOfBirth,
       timeOfBirth,
       placeOfBirth,
-      tempChartId // optional: temporary chart generated before signup
+      tempChartId, // optional: temporary chart generated before signup
+      chartId,
+      birthChartId
     } = req.body;
+
+    const resolvedChartId = normalizeChartId(tempChartId)
+      || normalizeChartId(chartId)
+      || normalizeChartId(birthChartId)
+      || normalizeChartId(req.body?.birthChart)
+      || normalizeChartId(req.body?.chart);
 
     // 1️⃣ Basic validations
     if (!dateOfBirth || !timeOfBirth || !placeOfBirth) {
@@ -116,19 +134,26 @@ export async function handleAstrologySignup(req, res) {
 
     // 5️⃣ Link temporary birth chart (if provided)
     let birthChart = null;
-    if (tempChartId) {
+    if (resolvedChartId && validator.isMongoId(resolvedChartId)) {
       try {
-        birthChart = await BirthChart.findById(tempChartId);
+        birthChart = await BirthChart.findById(resolvedChartId);
         if (birthChart) {
           birthChart.userId = user._id;
           birthChart.isTemporary = false;
           await birthChart.save();
         } else {
-          console.warn("Temporary chart not found for ID:", tempChartId);
+          console.warn("Temporary chart not found for ID:", resolvedChartId);
         }
       } catch (err) {
         console.warn("Failed to link temporary chart:", err.message);
       }
+    } else if (resolvedChartId) {
+      console.warn("Invalid temp chart id supplied:", resolvedChartId);
+    }
+
+    if (!birthChart) {
+      birthChart = await BirthChart.findOne({ userId: user._id, isTemporary: false })
+        .sort({ createdAt: -1 });
     }
 
     // 6️⃣ Generate JWT tokens
@@ -150,8 +175,10 @@ export async function handleAstrologySignup(req, res) {
         name: user.name,
         sessionId: user.sessionId,
         astrologyProfile: user.astrologyProfile,
+          chartsCount: birthChart ? 1 : 0,
         birthChart: birthChart
           ? {
+            id: birthChart._id,
               chartImage: birthChart.chartImage,
               chartData: birthChart.chartData,
               rashi: birthChart.rashi,
