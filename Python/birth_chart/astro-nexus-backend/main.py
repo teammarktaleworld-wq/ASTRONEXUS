@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException
 import swisseph as swe
+from dotenv import load_dotenv
+import os
 from datetime import datetime, timedelta, date
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder

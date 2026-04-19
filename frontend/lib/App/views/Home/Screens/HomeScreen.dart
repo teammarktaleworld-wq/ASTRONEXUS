@@ -1124,24 +1124,43 @@ class _HomescreenState extends State<Homescreen> with TickerProviderStateMixin {
 
           /// 📝 NAME FIELD
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.08),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Colors.white.withOpacity(.08)),
+              border: Border.all(color: Colors.black.withOpacity(0.08), width: 1.1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.10),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: TextField(
-              style: GoogleFonts.dmSans(color: Colors.white),
-              cursorColor: const Color(0xff6EE7F9),
+              style: GoogleFonts.dmSans(color: const Color(0xFF23264A), fontWeight: FontWeight.w500),
+              cursorColor: const Color(0xFF8B7CF6),
               decoration: InputDecoration(
-                hintText: "Your Name",
-                hintStyle: GoogleFonts.dmSans(color: Colors.white38),
+                hintText: "Search products...",
+                hintStyle: GoogleFonts.dmSans(color: const Color(0xFF6B7280), fontWeight: FontWeight.w500),
                 border: InputBorder.none,
+                prefixIcon: Container(
+                  margin: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF8B7CF6).withOpacity(0.10),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.search_rounded,
+                    color: Color(0xFF8B7CF6),
+                    size: 20,
+                  ),
+                ),
               ),
             ),
           ),
 
-          const SizedBox(height: 14),
+           SizedBox(height: 14),
 
           /// ⭐ RATING
           Row(
@@ -1209,6 +1228,7 @@ class _HomescreenState extends State<Homescreen> with TickerProviderStateMixin {
               ),
             ),
           ),
+          
         ],
       ),
     );

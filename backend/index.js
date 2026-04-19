@@ -43,9 +43,8 @@ import couponRoutes from "./routes/admin/coupons.js";
 import notificationRoutes from "./routes/notification/notificationRoutes.js";
 import { startUnifiedInternalServices } from "./service/unifiedServiceLauncher.js";
 
-
-
-
+// Access GROQ_API_KEY from environment
+const groqApiKey = process.env.GROQ_API_KEY;
 
 // ==================================================
 
