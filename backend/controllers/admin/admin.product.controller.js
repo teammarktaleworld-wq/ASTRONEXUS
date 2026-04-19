@@ -226,14 +226,11 @@ export const deleteProductPermanent = async (req, res) => {
 
 export const getHomeProducts = async (req, res) => {
   try {
-    // ✅ First, get active products marked for home
-    let products = await Product.find({
-      isActive: true,
-      isDeleted: false,
-      showInHome: true
-    })
-      .sort({ homePriority: -1, lastShownAt: 1, createdAt: -1 })
-      .limit(10);
+    // ✅ Get up to 10 random home products
+    let products = await Product.aggregate([
+      { $match: { isActive: true, isDeleted: false, showInHome: true } },
+      { $sample: { size: 10 } }
+    ]);
 
     // ✅ If less than 3, get fallback products
     if (products.length < 3) {
@@ -248,7 +245,7 @@ export const getHomeProducts = async (req, res) => {
       products.push(...fallback);
     }
 
-    // ✅ Update lastShownAt for rotation
+    // Optionally update lastShownAt for analytics/rotation
     const now = new Date();
     await Promise.all(
       products.map(p => Product.findByIdAndUpdate(p._id, { lastShownAt: now }))

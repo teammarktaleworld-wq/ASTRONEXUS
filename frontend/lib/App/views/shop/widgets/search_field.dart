@@ -24,33 +24,39 @@ class SearchField extends StatelessWidget {
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final surface = isDark
-        ? const Color(0xFF1F2743).withValues(alpha: 0.88)
-        : Colors.white.withValues(alpha: 0.96);
+      ? Colors.white.withOpacity(0.97) // white background in dark mode
+      : Colors.white.withOpacity(0.96);
     final border = isDark
-        ? Colors.white.withValues(alpha: 0.14)
-        : colors.primary.withValues(alpha: 0.22);
+      ? Colors.black.withOpacity(0.08) // subtle border in dark mode
+      : colors.primary.withOpacity(0.22);
     final hint = isDark
-        ? Colors.white60
-        : colors.onSurface.withValues(alpha: 0.52);
+      ? const Color(0xFF6B7280) // dark hint in white field
+      : colors.onSurface.withOpacity(0.52);
+    final textColor = isDark
+      ? const Color(0xFF23264A) // dark text for white field
+      : colors.onSurface;
+    final iconColor = isDark
+      ? const Color(0xFF8B7CF6) // accent icon in dark mode
+      : colors.primary;
     final shadow = isDark
-        ? Colors.black.withValues(alpha: 0.28)
-        : Colors.black.withValues(alpha: 0.08);
+      ? Colors.black.withOpacity(0.13)
+      : Colors.black.withOpacity(0.08);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
           decoration: BoxDecoration(
             color: surface,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: border),
+            border: Border.all(color: border, width: 1.1),
             boxShadow: <BoxShadow>[
               BoxShadow(
                 color: shadow,
-                blurRadius: 14,
-                offset: const Offset(0, 6),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -58,7 +64,7 @@ class SearchField extends StatelessWidget {
             controller: controller,
             onChanged: onChanged,
             style: GoogleFonts.dmSans(
-              color: colors.onSurface,
+              color: textColor,
               fontWeight: FontWeight.w500,
             ),
             decoration: InputDecoration(
@@ -72,13 +78,13 @@ class SearchField extends StatelessWidget {
                 margin: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : colors.primary.withValues(alpha: 0.1),
+                      ? Colors.white.withOpacity(0.10)
+                      : colors.primary.withOpacity(0.10),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   Icons.search_rounded,
-                  color: colors.primary,
+                  color: iconColor,
                   size: 20,
                 ),
               ),
@@ -86,7 +92,9 @@ class SearchField extends StatelessWidget {
                   ? IconButton(
                       icon: Icon(
                         Icons.close_rounded,
-                        color: colors.onSurface.withValues(alpha: 0.72),
+                        color: isDark
+                            ? const Color(0xFF23264A)
+                            : colors.onSurface.withOpacity(0.72),
                       ),
                       onPressed: onClear,
                     )
