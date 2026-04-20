@@ -46,10 +46,7 @@ class _BirthChartScreenState extends State<BirthChartScreen> {
         final isDark = theme.brightness == Brightness.dark;
         Widget themedChild = child!;
         if (isDark) {
-          themedChild = Material(
-            color: AppColors.background,
-            child: child,
-          );
+          themedChild = Material(color: AppColors.background, child: child);
         }
         return Theme(
           data: theme.copyWith(
@@ -525,7 +522,7 @@ class _BirthChartScreenState extends State<BirthChartScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final fillColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
+        ? Colors.white.withValues(alpha: 0.5)
         : Colors.white.withValues(alpha: 0.99);
     final borderColor = isDark
         ? Colors.white.withValues(alpha: 0.22)

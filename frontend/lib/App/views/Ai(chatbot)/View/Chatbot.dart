@@ -11,6 +11,7 @@ import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:shimmer/shimmer.dart";
 
 import "../helper/chat_suggestion.dart";
+import "../helper/mati_report_pdf_service.dart";
 import "../widgets/chat/chat_bubble.dart";
 import "../widgets/suggestion_chip.dart";
 
@@ -579,6 +580,10 @@ class _MatiInsightBubble extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (response.timing != null && response.timing!.hasContent) ...<Widget>[
+                    const SizedBox(height: 12),
+                    _TimingCard(timing: response.timing!),
+                  ],
                   if (response.analysis != null) ...<Widget>[
                     const SizedBox(height: 10),
                     _InsightMetricStrip(analysis: response.analysis!),
@@ -591,11 +596,21 @@ class _MatiInsightBubble extends StatelessWidget {
                     const SizedBox(height: 12),
                     _VerdictCard(uiMetadata: response.uiMetadata!),
                   ],
+                  if (response.nutritionGuidance != null) ...<Widget>[
+                    const SizedBox(height: 12),
+                    _NutritionGuidanceCard(
+                      guidance: response.nutritionGuidance!,
+                    ),
+                  ],
                   if (response.shopSuggestions.isNotEmpty) ...<Widget>[
                     const SizedBox(height: 12),
                     _ShopSuggestionList(
                       suggestions: response.shopSuggestions.take(2).toList(),
                     ),
+                  ],
+                  if (response.report != null && response.report!.hasContent) ...<Widget>[
+                    const SizedBox(height: 12),
+                    _ReportDownloadCard(response: response),
                   ],
                   if (response.service.isNotEmpty) ...<Widget>[
                     const SizedBox(height: 10),
@@ -664,6 +679,319 @@ class _InsightMetricStrip extends StatelessWidget {
             label: "Negative",
             value: "${negative.toStringAsFixed(0)}%",
             color: const Color(0xFFEF4444),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TimingCard extends StatelessWidget {
+  const _TimingCard({required this.timing});
+
+  final MatiTimingInfo timing;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final bodyColor = isDark ? Colors.white70 : const Color(0xFF475569);
+    final surfaceColor = isDark
+        ? const Color(0xFF152243).withValues(alpha: 0.86)
+        : const Color(0xFFF8FBFF);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark ? Colors.white12 : const Color(0xFFDDE7F7),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Icon(
+                Icons.event_available_rounded,
+                size: 18,
+                color: timing.requiresBirthData
+                    ? const Color(0xFFF59E0B)
+                    : const Color(0xFF16A34A),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                timing.requiresBirthData ? "Exact Date Needed" : "Timing Guidance",
+                style: GoogleFonts.dmSans(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
+                  color: titleColor,
+                ),
+              ),
+            ],
+          ),
+          if (timing.note.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              timing.note,
+              style: GoogleFonts.dmSans(
+                fontSize: 12.5,
+                height: 1.45,
+                fontWeight: FontWeight.w500,
+                color: bodyColor,
+              ),
+            ),
+          ],
+          if (timing.favorableDates.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 10),
+            Text(
+              "Favorable dates",
+              style: GoogleFonts.dmSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: titleColor,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: timing.favorableDates
+                  .map(
+                    (item) => _DateSuggestionChip(
+                      item: item,
+                      positive: true,
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+          if (timing.avoidDates.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 10),
+            Text(
+              "Use extra care on",
+              style: GoogleFonts.dmSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: titleColor,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: timing.avoidDates
+                  .map(
+                    (item) => _DateSuggestionChip(
+                      item: item,
+                      positive: false,
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DateSuggestionChip extends StatelessWidget {
+  const _DateSuggestionChip({required this.item, required this.positive});
+
+  final MatiDateSuggestion item;
+  final bool positive;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fill = positive
+        ? const Color(0xFF22C55E).withValues(alpha: isDark ? 0.16 : 0.12)
+        : const Color(0xFFEF4444).withValues(alpha: isDark ? 0.16 : 0.1);
+    final stroke = positive
+        ? const Color(0xFF16A34A)
+        : const Color(0xFFDC2626);
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final bodyColor = isDark ? Colors.white70 : const Color(0xFF64748B);
+
+    return Container(
+      constraints: const BoxConstraints(minWidth: 120, maxWidth: 220),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        color: fill,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: stroke.withValues(alpha: 0.8)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            item.date,
+            style: GoogleFonts.dmSans(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+              color: titleColor,
+            ),
+          ),
+          if (item.confidence.isNotEmpty || item.label.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 2),
+            Text(
+              [
+                if (item.label.isNotEmpty) item.label,
+                if (item.confidence.isNotEmpty) item.confidence.toUpperCase(),
+              ].join(" • "),
+              style: GoogleFonts.dmSans(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w600,
+                color: bodyColor,
+              ),
+            ),
+          ],
+          if (item.reason.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 4),
+            Text(
+              item.reason,
+              style: GoogleFonts.dmSans(
+                fontSize: 11,
+                height: 1.35,
+                fontWeight: FontWeight.w500,
+                color: bodyColor,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ReportDownloadCard extends StatelessWidget {
+  const _ReportDownloadCard({required this.response});
+
+  final MatiChatResponse response;
+
+  @override
+  Widget build(BuildContext context) {
+    final report = response.report!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final bodyColor = isDark ? Colors.white70 : const Color(0xFF475569);
+    final bgColor = isDark
+        ? const Color(0xFF0F1E38).withValues(alpha: 0.9)
+        : const Color(0xFFF5FAFF);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? Colors.white12 : const Color(0xFFDCE7F8),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDC2626).withValues(
+                    alpha: isDark ? 0.24 : 0.12,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.picture_as_pdf_rounded,
+                  color: Color(0xFFDC2626),
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      report.title.isEmpty ? "PDF report ready" : report.title,
+                      style: GoogleFonts.dmSans(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: titleColor,
+                      ),
+                    ),
+                    if (report.subtitle.isNotEmpty)
+                      Text(
+                        report.subtitle,
+                        style: GoogleFonts.dmSans(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w500,
+                          color: bodyColor,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (report.summary.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 10),
+            Text(
+              report.summary,
+              style: GoogleFonts.dmSans(
+                fontSize: 12.5,
+                height: 1.45,
+                fontWeight: FontWeight.w500,
+                color: bodyColor,
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                try {
+                  await MatiReportPdfService.generateAndOpen(response);
+                  if (!context.mounted) {
+                    return;
+                  }
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text("PDF report generated successfully."),
+                    ),
+                  );
+                } catch (error) {
+                  if (!context.mounted) {
+                    return;
+                  }
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text("Unable to generate PDF: $error"),
+                    ),
+                  );
+                }
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF0F766E),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              icon: const Icon(Icons.download_rounded),
+              label: Text(
+                "Download PDF report",
+                style: GoogleFonts.dmSans(fontWeight: FontWeight.w700),
+              ),
+            ),
           ),
         ],
       ),
@@ -1068,6 +1396,198 @@ class _VerdictCard extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _NutritionGuidanceCard extends StatelessWidget {
+  const _NutritionGuidanceCard({required this.guidance});
+
+  final MatiNutritionGuidance guidance;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final cardColor = isDark ? Colors.white10 : const Color(0xFFF7FBF2);
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final bodyColor = isDark ? Colors.white70 : const Color(0xFF475569);
+    final accent = const Color(0xFF16A34A);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: accent.withValues(alpha: isDark ? 0.28 : 0.18),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Icon(Icons.restaurant_menu_rounded, size: 18, color: accent),
+              const SizedBox(width: 8),
+              Text(
+                "Astro Nutrition",
+                style: GoogleFonts.dmSans(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
+                  color: titleColor,
+                ),
+              ),
+            ],
+          ),
+          if (guidance.focus.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              "Focus: ${guidance.focus}",
+              style: GoogleFonts.dmSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: titleColor,
+                height: 1.35,
+              ),
+            ),
+          ],
+          if (guidance.dominantPlanets.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: guidance.dominantPlanets.map((planet) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: isDark ? 0.18 : 0.12),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    planet,
+                    style: GoogleFonts.dmSans(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      color: titleColor,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+          if (guidance.foodsToFavor.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 10),
+            _FoodTagSection(
+              title: "Favor",
+              tags: guidance.foodsToFavor.take(4).toList(),
+              color: const Color(0xFF22C55E),
+            ),
+          ],
+          if (guidance.foodsToLimit.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            _FoodTagSection(
+              title: "Go Easy",
+              tags: guidance.foodsToLimit.take(4).toList(),
+              color: const Color(0xFFEAB308),
+            ),
+          ],
+          if (guidance.mealSuggestion.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 10),
+            Text(
+              guidance.mealSuggestion,
+              style: GoogleFonts.dmSans(
+                fontSize: 11.8,
+                fontWeight: FontWeight.w500,
+                color: bodyColor,
+                height: 1.4,
+              ),
+            ),
+          ],
+          if (guidance.timingTip.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              guidance.timingTip,
+              style: GoogleFonts.dmSans(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                color: bodyColor,
+                height: 1.35,
+              ),
+            ),
+          ],
+          if (guidance.note.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              guidance.note,
+              style: GoogleFonts.dmSans(
+                fontSize: 10.8,
+                fontWeight: FontWeight.w500,
+                color: bodyColor.withValues(alpha: 0.9),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _FoodTagSection extends StatelessWidget {
+  const _FoodTagSection({
+    required this.title,
+    required this.tags,
+    required this.color,
+  });
+
+  final String title;
+  final List<String> tags;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final bodyColor = isDark ? Colors.white70 : const Color(0xFF475569);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          title,
+          style: GoogleFonts.dmSans(
+            fontSize: 11.8,
+            fontWeight: FontWeight.w700,
+            color: titleColor,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: tags.map((tag) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: isDark ? 0.18 : 0.12),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                tag,
+                style: GoogleFonts.dmSans(
+                  fontSize: 10.6,
+                  fontWeight: FontWeight.w600,
+                  color: bodyColor,
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }

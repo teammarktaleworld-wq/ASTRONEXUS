@@ -108,7 +108,7 @@ class ChatBubble extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 7),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: isUser
@@ -137,30 +137,101 @@ class ChatBubble extends StatelessWidget {
           Flexible(
             child: Container(
               constraints: BoxConstraints(maxWidth: maxWidth),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: isUser
+                  ? const EdgeInsets.symmetric(horizontal: 16, vertical: 14)
+                  : const EdgeInsets.fromLTRB(14, 12, 14, 16),
               decoration: BoxDecoration(
-                gradient: isUser ? userGradient : null,
-                color: isUser ? null : botBubbleColor,
+                gradient: isUser
+                    ? userGradient
+                    : LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: isDark
+                            ? [
+                                const Color(0xFF2B2E4A).withOpacity(0.92),
+                                const Color(0xFF23264A).withOpacity(0.98),
+                              ]
+                            : [
+                                Colors.white.withOpacity(0.98),
+                                const Color(0xFFF3F7FF).withOpacity(0.98),
+                              ],
+                      ),
+                color: isUser ? null : null,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(18),
                   topRight: const Radius.circular(18),
-                  bottomLeft: Radius.circular(isUser ? 18 : 6),
-                  bottomRight: Radius.circular(isUser ? 6 : 18),
+                  bottomLeft: Radius.circular(isUser ? 18 : 7),
+                  bottomRight: Radius.circular(isUser ? 7 : 18),
                 ),
                 border: Border.all(
                   color: isUser
                       ? Colors.transparent
                       : (isDark ? Colors.white24 : const Color(0xFFD8E3F6)),
+                  width: 1.2,
                 ),
                 boxShadow: <BoxShadow>[
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.08),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
+                    color: Colors.black.withOpacity(isDark ? 0.18 : 0.07),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
-              child: RichText(text: buildSpan()),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (!isUser) ...[
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF3B3F5C).withOpacity(0.7)
+                                : const Color(0xFF7C3AED).withOpacity(0.18),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.auto_awesome_rounded,
+                                size: 15,
+                                color: Color(0xFFDBC33F),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                "Mati Prediction",
+                                style: GoogleFonts.dmSans(
+                                  color: isDark
+                                      ? Colors.white.withOpacity(0.92)
+                                      : const Color(0xFF2B2E4A),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13.2,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Spacer(),
+                        Icon(
+                          Icons.auto_graph_rounded,
+                          size: 17,
+                          color: isDark
+                              ? const Color(0xFFDBC33F)
+                              : const Color(0xFF7C3AED),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  RichText(text: buildSpan()),
+                ],
+              ),
             ),
           ),
           if (isUser) ...<Widget>[

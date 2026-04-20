@@ -263,39 +263,21 @@ class _TarotScreenState extends State<TarotScreen> {
     required TextEditingController controller,
     TextInputType keyboardType = TextInputType.text,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final fillColor = isDark
-        ? Colors.white.withOpacity(
-            0.92,
-          ) // much lighter, white-like for dark mode
-        : Colors.white.withOpacity(0.97);
-    final borderColor = isDark
-        ? const Color(0xFFE0E3EA) // soft light border for dark mode
-        : const Color(0xFFD7E3F7);
-    final textColor = isDark
-        ? const Color(0xFF23264A) // dark text for white-like field in dark mode
-        : const Color(0xFF0F172A);
-    final hintColor = isDark
-        ? const Color(0xFF6B7280) // subtle dark hint
-        : const Color(0xFF64748B);
-    final iconColor = isDark
-        ? const Color(0xFF8B7CF6) // soft accent for icon in dark mode
-        : const Color(0xFF2563EB);
-
+    // Always use pure white fill and pure black text for maximum clarity
     return Container(
       decoration: BoxDecoration(
-        color: fillColor,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 1.2),
+        border: Border.all(color: Colors.black12, width: 1.2),
       ),
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
-        style: GoogleFonts.dmSans(color: textColor, fontSize: 14),
+        style: GoogleFonts.dmSans(color: Colors.black, fontSize: 14),
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: iconColor),
+          prefixIcon: Icon(icon, color: Colors.black54),
           hintText: label,
-          hintStyle: GoogleFonts.dmSans(color: hintColor),
+          hintStyle: GoogleFonts.dmSans(color: Colors.black38),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 14,

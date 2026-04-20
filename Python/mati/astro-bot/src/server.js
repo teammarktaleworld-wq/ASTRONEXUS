@@ -1,11 +1,11 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import apiRoutes from './routes/apiRoutes.js';
+import { ensureEnvLoaded } from './lib/env.js';
 
-dotenv.config();
+ensureEnvLoaded();
 
 const app = express();
 const PORT = process.env.PORT || 3000;

@@ -14,7 +14,7 @@ class UnifiedDarkUi {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final background = isDark ? AppColors.appBarDark : AppColors.lightContainer;
-    final foreground = isDark ? AppColors.onDark : AppColors.lightTextPrimary;
+    final foreground = isDark ? AppColors.onDark : Colors.white;
 
     return AppBar(
       backgroundColor: background,

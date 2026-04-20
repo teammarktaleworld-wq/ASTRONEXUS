@@ -1128,7 +1128,10 @@ class _HomescreenState extends State<Homescreen> with TickerProviderStateMixin {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Colors.black.withOpacity(0.08), width: 1.1),
+              border: Border.all(
+                color: Colors.black.withOpacity(0.08),
+                width: 1.1,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.10),
@@ -1138,11 +1141,17 @@ class _HomescreenState extends State<Homescreen> with TickerProviderStateMixin {
               ],
             ),
             child: TextField(
-              style: GoogleFonts.dmSans(color: const Color(0xFF23264A), fontWeight: FontWeight.w500),
+              style: GoogleFonts.dmSans(
+                color: const Color(0xFF23264A),
+                fontWeight: FontWeight.w500,
+              ),
               cursorColor: const Color(0xFF8B7CF6),
               decoration: InputDecoration(
                 hintText: "Search products...",
-                hintStyle: GoogleFonts.dmSans(color: const Color(0xFF6B7280), fontWeight: FontWeight.w500),
+                hintStyle: GoogleFonts.dmSans(
+                  color: const Color(0xFF6B7280),
+                  fontWeight: FontWeight.w500,
+                ),
                 border: InputBorder.none,
                 prefixIcon: Container(
                   margin: const EdgeInsets.all(8),
@@ -1160,7 +1169,7 @@ class _HomescreenState extends State<Homescreen> with TickerProviderStateMixin {
             ),
           ),
 
-           SizedBox(height: 14),
+          SizedBox(height: 14),
 
           /// ⭐ RATING
           Row(
@@ -1228,7 +1237,6 @@ class _HomescreenState extends State<Homescreen> with TickerProviderStateMixin {
               ),
             ),
           ),
-          
         ],
       ),
     );

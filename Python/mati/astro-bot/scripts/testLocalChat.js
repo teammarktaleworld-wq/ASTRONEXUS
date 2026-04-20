@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
-import dotenv from 'dotenv';
+import { ensureEnvLoaded } from '../src/lib/env.js';
 
-dotenv.config();
+ensureEnvLoaded();
 
 const PORT = process.env.PORT || 3000;
 const BASE_URL = `http://localhost:${PORT}`;
@@ -80,6 +80,45 @@ async function testLocalChat() {
     });
 
     console.log('\n' + '='.repeat(60));
+    console.log('TIMING INSIGHT:');
+    console.log('='.repeat(60));
+    if (data.timing) {
+      console.log(`Exact date possible: ${Boolean(data.timing.exactDatePossible)}`);
+      console.log(`Needs birth data:    ${Boolean(data.timing.requiresBirthData)}`);
+      if (Array.isArray(data.timing.favorableDates) && data.timing.favorableDates.length > 0) {
+        console.log('Favorable dates:');
+        data.timing.favorableDates.forEach((item, index) => {
+          console.log(`  [${index + 1}] ${item.date} (${item.confidence || 'medium'}) - ${item.reason || 'No reason provided'}`);
+        });
+      } else {
+        console.log('No favorable dates returned');
+      }
+      if (data.timing.note) {
+        console.log(`Note: ${data.timing.note}`);
+      }
+    } else {
+      console.log('No timing insight returned');
+    }
+
+    console.log('\n' + '='.repeat(60));
+    console.log('REPORT DATA:');
+    console.log('='.repeat(60));
+    if (data.report) {
+      console.log(`Title: ${data.report.title}`);
+      console.log(`File:  ${data.report.fileName}`);
+      console.log(`Date:  ${data.report.generatedOn}`);
+      console.log(`Summary: ${data.report.summary}`);
+      if (Array.isArray(data.report.sections) && data.report.sections.length > 0) {
+        console.log('Sections:');
+        data.report.sections.forEach((section, index) => {
+          console.log(`  [${index + 1}] ${section.heading}: ${section.content.substring(0, 120)}...`);
+        });
+      }
+    } else {
+      console.log('No report payload returned');
+    }
+
+    console.log('\n' + '='.repeat(60));
     console.log('SHOP SUGGESTIONS:');
     console.log('='.repeat(60));
     if (data.shopSuggestions && data.shopSuggestions.length > 0) {
@@ -90,6 +129,19 @@ async function testLocalChat() {
       });
     } else {
       console.log('No shop suggestions returned');
+    }
+
+    console.log('\n' + '='.repeat(60));
+    console.log('ASTRO NUTRITION:');
+    console.log('='.repeat(60));
+    if (data.nutritionGuidance) {
+      console.log(`Focus: ${data.nutritionGuidance.focus || 'N/A'}`);
+      console.log(`Favor: ${(data.nutritionGuidance.foodsToFavor || []).join(', ') || 'N/A'}`);
+      console.log(`Go Easy: ${(data.nutritionGuidance.foodsToLimit || []).join(', ') || 'N/A'}`);
+      console.log(`Meal: ${data.nutritionGuidance.mealSuggestion || 'N/A'}`);
+      console.log(`Timing: ${data.nutritionGuidance.timingTip || 'N/A'}`);
+    } else {
+      console.log('No nutrition guidance returned');
     }
 
     console.log('\n' + '='.repeat(60));

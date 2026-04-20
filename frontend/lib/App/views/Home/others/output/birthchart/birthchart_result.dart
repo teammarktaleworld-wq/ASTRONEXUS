@@ -3,6 +3,8 @@ import "package:astro_tale/core/theme/app_gradients.dart";
 import "package:astro_tale/helper/chart_cache_helper.dart";
 import "package:flutter/material.dart";
 import "package:flutter_svg/svg.dart";
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 import "package:google_fonts/google_fonts.dart";
 
 import "../../../../../../helper/Widgets/Pdf_downloader.dart";
@@ -195,49 +197,98 @@ class _BirthChartResultState extends State<BirthChartResult> {
                                             placeholderBuilder: (_) => SizedBox(
                                               height: 320,
                                               child: Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      color: colors.primary,
-                                                    ),
+                                                child: CircularProgressIndicator(
+                                                  color: colors.primary,
+                                                ),
                                               ),
                                             ),
                                           )
-                                        : Image.network(
-                                            chartImageUrl,
-                                            errorBuilder: (_, __, ___) {
-                                              if (_activeChartIndex <
-                                                  chartImageCandidates.length -
-                                                      1) {
-                                                WidgetsBinding.instance
-                                                    .addPostFrameCallback((_) {
-                                                      if (mounted) {
-                                                        setState(
-                                                          () =>
-                                                              _activeChartIndex +=
-                                                                  1,
-                                                        );
-                                                      }
-                                                    });
+                                        : CachedNetworkImage(
+                                            imageUrl: chartImageUrl,
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) => Shimmer.fromColors(
+                                              baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+                                              highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+                                              child: Container(
+                                                height: 320,
+                                                color: Colors.black12,
+                                              ),
+                                            ),
+                                            errorWidget: (context, url, error) {
+                                              if (_activeChartIndex < chartImageCandidates.length - 1) {
+                                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                  if (mounted) {
+                                                    setState(() => _activeChartIndex += 1);
+                                                  }
+                                                });
                                                 return _retryingText();
                                               }
-                                              return Image.asset(
-                                                "assets/images/birthchart.png",
-                                                fit: BoxFit.cover,
+                                              return Stack(
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  Image.asset(
+                                                    "assets/images/birthchart.png",
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                  Container(
+                                                    color: Colors.black.withOpacity(0.45),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                                      child: Text(
+                                                        "Image not found",
+                                                        style: GoogleFonts.dmSans(
+                                                          color: Colors.white,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               );
                                             },
                                           ),
                                   ),
                                 )
                               else
-                                Text(
-                                  context.l10n.tr("chartImageUnavailable"),
-                                  style: GoogleFonts.dmSans(
-                                    color: isDark
-                                        ? Colors.white54
-                                        : colors.onSurface.withValues(
-                                            alpha: 0.6,
+                                Column(
+                                  children: [
+                                    Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        Image.asset(
+                                          "assets/images/birthchart.png",
+                                          fit: BoxFit.cover,
+                                          height: 220,
+                                        ),
+                                        Container(
+                                          color: Colors.black.withOpacity(0.45),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                            child: Text(
+                                              "Image not found",
+                                              style: GoogleFonts.dmSans(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
                                           ),
-                                  ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      context.l10n.tr("chartImageUnavailable"),
+                                      style: GoogleFonts.dmSans(
+                                        color: isDark
+                                            ? Colors.white54
+                                            : colors.onSurface.withValues(
+                                                alpha: 0.6,
+                                              ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                             ],
                           ),

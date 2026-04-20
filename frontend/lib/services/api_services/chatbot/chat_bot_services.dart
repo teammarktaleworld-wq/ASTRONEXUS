@@ -15,6 +15,23 @@ class ChatbotService {
 
     final sessionId = (prefs.getString("sessionId") ?? "astro-session").trim();
     final token = (prefs.getString("auth_token") ?? "").trim();
+    final birthDate = (prefs.getString("birthDate") ?? "").trim();
+    final birthTime = (prefs.getString("birthTime") ?? "").trim();
+    final birthPlace = (prefs.getString("birthPlace") ?? "").trim();
+    final zodiacSign = (prefs.getString("zodiacSign") ?? "").trim();
+    final userProfile = <String, dynamic>{};
+    if (birthDate.isNotEmpty) {
+      userProfile["birthDate"] = birthDate;
+    }
+    if (birthTime.isNotEmpty) {
+      userProfile["birthTime"] = birthTime;
+    }
+    if (birthPlace.isNotEmpty) {
+      userProfile["birthPlace"] = birthPlace;
+    }
+    if (zodiacSign.isNotEmpty) {
+      userProfile["zodiacSign"] = zodiacSign;
+    }
 
     final headers = <String, String>{"Content-Type": "application/json"};
     if (token.isNotEmpty) {
@@ -28,6 +45,7 @@ class ChatbotService {
           body: jsonEncode(<String, dynamic>{
             "sessionId": sessionId.isEmpty ? "astro-session" : sessionId,
             "message": question,
+            if (userProfile.isNotEmpty) "userProfile": userProfile,
           }),
         )
         .timeout(const Duration(seconds: 25));
@@ -43,7 +61,7 @@ class ChatbotService {
     }
 
     debugPrint("Chatbot error ${response.statusCode}: ${response.body}");
-    throw Exception(data["message"] ?? "Server error");
+    throw Exception(data["error"] ?? data["message"] ?? "Server error");
   }
 
   static Map<String, dynamic> _asStringDynamicMap(dynamic value) {
@@ -64,7 +82,10 @@ class MatiChatResponse {
     required this.ok,
     required this.answer,
     this.analysis,
+    this.timing,
+    this.report,
     this.uiMetadata,
+    this.nutritionGuidance,
     this.shopSuggestions = const <MatiShopSuggestion>[],
     this.raw = const <String, dynamic>{},
   });
@@ -74,12 +95,20 @@ class MatiChatResponse {
   final bool ok;
   final String answer;
   final MatiAnalysis? analysis;
+  final MatiTimingInfo? timing;
+  final MatiReportData? report;
   final MatiUiMetadata? uiMetadata;
+  final MatiNutritionGuidance? nutritionGuidance;
   final List<MatiShopSuggestion> shopSuggestions;
   final Map<String, dynamic> raw;
 
   bool get hasRichData =>
-      analysis != null || uiMetadata != null || shopSuggestions.isNotEmpty;
+      analysis != null ||
+      (timing?.hasContent ?? false) ||
+      (report?.hasContent ?? false) ||
+      uiMetadata != null ||
+      nutritionGuidance != null ||
+      shopSuggestions.isNotEmpty;
 
   factory MatiChatResponse.fromApiJson(Map<String, dynamic> json) {
     final data = _asStringDynamicMap(json["data"]).isEmpty
@@ -87,7 +116,10 @@ class MatiChatResponse {
         : _asStringDynamicMap(json["data"]);
 
     final analysisMap = _asStringDynamicMap(data["analysis"]);
+    final timingMap = _asStringDynamicMap(data["timing"]);
+    final reportMap = _asStringDynamicMap(data["report"]);
     final uiMetadataMap = _asStringDynamicMap(data["uiMetadata"]);
+    final nutritionMap = _asStringDynamicMap(data["nutritionGuidance"]);
     final shopRaw = data["shopSuggestions"];
     final suggestions = <MatiShopSuggestion>[];
     if (shopRaw is List) {
@@ -105,11 +137,131 @@ class MatiChatResponse {
       ok: _asBool(data["ok"]),
       answer: data["answer"]?.toString() ?? json["answer"]?.toString() ?? "",
       analysis: analysisMap.isEmpty ? null : MatiAnalysis.fromJson(analysisMap),
+      timing: timingMap.isEmpty ? null : MatiTimingInfo.fromJson(timingMap),
+      report: reportMap.isEmpty ? null : MatiReportData.fromJson(reportMap),
       uiMetadata: uiMetadataMap.isEmpty
           ? null
           : MatiUiMetadata.fromJson(uiMetadataMap),
+      nutritionGuidance: nutritionMap.isEmpty
+          ? null
+          : MatiNutritionGuidance.fromJson(nutritionMap),
       shopSuggestions: suggestions,
       raw: json,
+    );
+  }
+}
+
+class MatiTimingInfo {
+  const MatiTimingInfo({
+    required this.requested,
+    required this.exactDatePossible,
+    required this.requiresBirthData,
+    required this.favorableDates,
+    required this.avoidDates,
+    required this.note,
+  });
+
+  final bool requested;
+  final bool exactDatePossible;
+  final bool requiresBirthData;
+  final List<MatiDateSuggestion> favorableDates;
+  final List<MatiDateSuggestion> avoidDates;
+  final String note;
+
+  bool get hasContent =>
+      favorableDates.isNotEmpty || avoidDates.isNotEmpty || note.isNotEmpty;
+
+  factory MatiTimingInfo.fromJson(Map<String, dynamic> json) {
+    return MatiTimingInfo(
+      requested: _asBool(json["requested"]),
+      exactDatePossible: _asBool(json["exactDatePossible"]),
+      requiresBirthData: _asBool(json["requiresBirthData"]),
+      favorableDates: _parseDateSuggestions(json["favorableDates"]),
+      avoidDates: _parseDateSuggestions(json["avoidDates"]),
+      note: json["note"]?.toString() ?? "",
+    );
+  }
+}
+
+class MatiDateSuggestion {
+  const MatiDateSuggestion({
+    required this.date,
+    required this.label,
+    required this.confidence,
+    required this.reason,
+  });
+
+  final String date;
+  final String label;
+  final String confidence;
+  final String reason;
+
+  factory MatiDateSuggestion.fromJson(Map<String, dynamic> json) {
+    return MatiDateSuggestion(
+      date: json["date"]?.toString() ?? "",
+      label: json["label"]?.toString() ?? "",
+      confidence: json["confidence"]?.toString() ?? "",
+      reason: json["reason"]?.toString() ?? "",
+    );
+  }
+}
+
+class MatiReportData {
+  const MatiReportData({
+    required this.requested,
+    required this.title,
+    required this.subtitle,
+    required this.summary,
+    required this.generatedOn,
+    required this.fileName,
+    required this.sections,
+  });
+
+  final bool requested;
+  final String title;
+  final String subtitle;
+  final String summary;
+  final String generatedOn;
+  final String fileName;
+  final List<MatiReportSection> sections;
+
+  bool get hasContent =>
+      title.isNotEmpty || summary.isNotEmpty || sections.isNotEmpty;
+
+  factory MatiReportData.fromJson(Map<String, dynamic> json) {
+    final rawSections = json["sections"];
+    final sections = <MatiReportSection>[];
+    if (rawSections is List) {
+      for (final item in rawSections) {
+        final mapItem = _asStringDynamicMap(item);
+        if (mapItem.isNotEmpty) {
+          sections.add(MatiReportSection.fromJson(mapItem));
+        }
+      }
+    }
+
+    return MatiReportData(
+      requested: _asBool(json["requested"]),
+      title: json["title"]?.toString() ?? "",
+      subtitle: json["subtitle"]?.toString() ?? "",
+      summary: json["summary"]?.toString() ?? "",
+      generatedOn: json["generatedOn"]?.toString() ?? "",
+      fileName: json["fileName"]?.toString() ?? "",
+      sections: sections,
+    );
+  }
+}
+
+class MatiReportSection {
+  const MatiReportSection({required this.heading, required this.content});
+
+  final String heading;
+  final String content;
+
+  factory MatiReportSection.fromJson(Map<String, dynamic> json) {
+    return MatiReportSection(
+      heading: json["heading"]?.toString() ?? "",
+      content: json["content"]?.toString() ?? "",
     );
   }
 }
@@ -207,6 +359,38 @@ class MatiUiMetadata {
   }
 }
 
+class MatiNutritionGuidance {
+  const MatiNutritionGuidance({
+    required this.focus,
+    required this.foodsToFavor,
+    required this.foodsToLimit,
+    required this.mealSuggestion,
+    required this.timingTip,
+    required this.dominantPlanets,
+    required this.note,
+  });
+
+  final String focus;
+  final List<String> foodsToFavor;
+  final List<String> foodsToLimit;
+  final String mealSuggestion;
+  final String timingTip;
+  final List<String> dominantPlanets;
+  final String note;
+
+  factory MatiNutritionGuidance.fromJson(Map<String, dynamic> json) {
+    return MatiNutritionGuidance(
+      focus: json["focus"]?.toString() ?? "",
+      foodsToFavor: _toStringList(json["foodsToFavor"]),
+      foodsToLimit: _toStringList(json["foodsToLimit"]),
+      mealSuggestion: json["mealSuggestion"]?.toString() ?? "",
+      timingTip: json["timingTip"]?.toString() ?? "",
+      dominantPlanets: _toStringList(json["dominantPlanets"]),
+      note: json["note"]?.toString() ?? "",
+    );
+  }
+}
+
 class MatiShopSuggestion {
   const MatiShopSuggestion({
     required this.id,
@@ -283,4 +467,19 @@ bool _asBool(dynamic value) {
     return value != 0;
   }
   return false;
+}
+
+List<MatiDateSuggestion> _parseDateSuggestions(dynamic value) {
+  if (value is! List) {
+    return const <MatiDateSuggestion>[];
+  }
+
+  final suggestions = <MatiDateSuggestion>[];
+  for (final item in value) {
+    final mapItem = _asStringDynamicMap(item);
+    if (mapItem.isNotEmpty) {
+      suggestions.add(MatiDateSuggestion.fromJson(mapItem));
+    }
+  }
+  return suggestions;
 }

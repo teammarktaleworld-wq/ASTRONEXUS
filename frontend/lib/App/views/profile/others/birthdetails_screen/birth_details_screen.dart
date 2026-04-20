@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 import "dart:convert";
 
 import "package:astro_tale/core/constants/app_colors.dart";
@@ -235,25 +237,21 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen>
     final activeUrl = chartImageCandidates[activeChartIndex];
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: Image.network(
-        activeUrl,
+      child: CachedNetworkImage(
+        imageUrl: activeUrl,
         height: 300,
         width: double.infinity,
         fit: BoxFit.contain,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) {
-            return child;
-          }
-          return SizedBox(
+        placeholder: (context, url) => Shimmer.fromColors(
+          baseColor: Colors.grey[800]!,
+          highlightColor: Colors.grey[700]!,
+          child: Container(
             height: 300,
-            child: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          );
-        },
-        errorBuilder: (_, __, ___) {
+            width: double.infinity,
+            color: Colors.black12,
+          ),
+        ),
+        errorWidget: (context, url, error) {
           if (activeChartIndex < chartImageCandidates.length - 1) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
@@ -283,11 +281,30 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen>
   Widget _chartFallback() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: Image.asset(
-        "assets/images/birthchart.png",
-        height: 300,
-        width: double.infinity,
-        fit: BoxFit.cover,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Image.asset(
+            "assets/images/birthchart.png",
+            height: 300,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+          Container(
+            color: Colors.black.withOpacity(0.45),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              child: Text(
+                "Image not found",
+                style: GoogleFonts.dmSans(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

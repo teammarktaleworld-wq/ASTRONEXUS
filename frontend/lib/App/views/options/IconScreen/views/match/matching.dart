@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:ui';
-
 import 'package:astro_tale/core/theme/app_gradients.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,9 +7,8 @@ import 'package:geocoding/geocoding.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import 'package:astro_tale/App/views/options/IconScreen/views/match/result/matchingScore.dart';
+import '../../../../../../core/widgets/animated_app_background.dart';
 import '../../../../../../services/API/APIservice.dart';
-import '../../../../../../ui_componets/cosmic/cosmic_one.dart';
-import '../../../../../../ui_componets/glass/glass_card.dart';
 
 class MatchingScreen extends StatefulWidget {
   const MatchingScreen({super.key});
@@ -327,98 +324,200 @@ class _MatchingScreenState extends State<MatchingScreen>
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: AppGradients.screenDecoration(theme),
-          ),
-
-          if (isDark)
-            Positioned.fill(
-              child: IgnorePointer(ignoring: true, child: SmoothShootingStars()),
-            ),
-
-          Positioned.fill(
-            child: IgnorePointer(
-              ignoring: true,
-              child: Container(color: AppGradients.screenOverlay(theme)),
-            ),
-          ),
-
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    _matchTopBar(context),
-                    const SizedBox(height: 20),
-                    Text(
-                      "Evaluate cosmic harmony & compatibility",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.dmSans(
-                        color: isDark
-                            ? Colors.white70
-                            : colors.onSurface.withOpacity(0.72),
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 22),
-
-                    _genderToggle(),
-                    const SizedBox(height: 18),
-
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 400),
-                      transitionBuilder: (child, anim) =>
-                          FadeTransition(opacity: anim, child: child),
-                      child: showMale ? _maleForm() : _femaleForm(),
-                    ),
-                    const SizedBox(height: 24),
-                    // ✅ Check Compatibility Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: isLoading ? null : _checkCompatibility,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          side: BorderSide(
-                            color: AppGradients.glassBorder(theme),
-                            width: 1.6,
-                          ),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: _modernMatchAppBar(context),
+      body: AnimatedAppBackground(
+        showStarsInDark: true,
+        showStarsInLight: true,
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final bool compact = constraints.maxWidth < 380;
+              final double cardMaxWidth = constraints.maxWidth < 560
+                  ? constraints.maxWidth
+                  : 520;
+              return SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: compact ? 10 : 20,
+                  vertical: 24,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: cardMaxWidth),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.white.withOpacity(0.18)
+                              : const Color(0xFFD6E3F6),
+                          width: 1.2,
                         ),
-                        child: isLoading
-                            ? LoadingAnimationWidget.fourRotatingDots(
-                                color: colors.onPrimary,
-                                size: 28,
-                              )
-                            : Text(
-                                "Check Compatibility",
-                                style: GoogleFonts.dmSans(
-                                  color: colors.onPrimary,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDark
+                                ? Colors.black.withOpacity(0.55)
+                                : const Color(0xFF7B91B8).withOpacity(0.9),
+                            blurRadius: 26,
+                            offset: const Offset(0, 12),
+                          ),
+                        ],
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: isDark
+                              ? [
+                                  const Color(0xFF3A4570).withOpacity(0.95),
+                                  const Color(0xFF2D365E).withOpacity(0.95),
+                                ]
+                              : [
+                                  Colors.white.withOpacity(0.98),
+                                  const Color(0xFFF3F7FF).withOpacity(0.98),
+                                ],
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(18, 16, 18, 20),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 10),
+                              Center(
+                                child: Text(
+                                  "Matching",
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: compact ? 22 : 24,
+                                    color: isDark
+                                        ? Colors.white
+                                        : const Color(0xFF64748B),
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
+                              const SizedBox(height: 8),
+                              Text(
+                                "Evaluate cosmic harmony & compatibility",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.dmSans(
+                                  color: isDark
+                                      ? Colors.white70
+                                      : colors.onSurface.withOpacity(0.72),
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 22),
+                              _genderToggle(),
+                              const SizedBox(height: 18),
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 400),
+                                transitionBuilder: (child, anim) =>
+                                    FadeTransition(opacity: anim, child: child),
+                                child: showMale ? _maleForm() : _femaleForm(),
+                              ),
+                              const SizedBox(height: 24),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 54,
+                                child: ElevatedButton(
+                                  onPressed: isLoading
+                                      ? null
+                                      : _checkCompatibility,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: isDark
+                                        ? const Color(0xFFF6C65A)
+                                        : colors.primary,
+                                    foregroundColor: isDark
+                                        ? const Color(0xFF1B1535)
+                                        : colors.onPrimary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 28,
+                                    ),
+                                  ),
+                                  child: isLoading
+                                      ? LoadingAnimationWidget.fourRotatingDots(
+                                          color: isDark
+                                              ? const Color(0xFF1B1535)
+                                              : colors.onPrimary,
+                                          size: 32,
+                                        )
+                                      : Text(
+                                          "Check Compatibility",
+                                          style: GoogleFonts.dmSans(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Modern glassy app bar for MatchingScreen
+  PreferredSizeWidget _modernMatchAppBar(BuildContext context) {
+    // Always use a dark app bar with white text/icons for consistency
+    return AppBar(
+      backgroundColor: const Color(0xFF23264A),
+      elevation: 0,
+      centerTitle: true,
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 12),
+        child: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: SizedBox(
+            height: 38,
+            width: 38,
+            child: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              size: 18,
+              color: Colors.white,
             ),
           ),
-        ],
+        ),
+      ),
+      title: Text(
+        "Matching",
+        style: GoogleFonts.dmSans(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
       ),
     );
   }
 
   Widget _maleForm() {
-    return glassCard(
+    final cardColor = const Color(0xFF23264A);
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withOpacity(0.10), width: 1.1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.10),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -426,7 +525,7 @@ class _MatchingScreenState extends State<MatchingScreen>
             "Male Details",
             style: GoogleFonts.dmSans(
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 12),
@@ -463,7 +562,21 @@ class _MatchingScreenState extends State<MatchingScreen>
   }
 
   Widget _femaleForm() {
-    return glassCard(
+    final cardColor = const Color(0xFF23264A);
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withOpacity(0.10), width: 1.1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.10),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -471,7 +584,7 @@ class _MatchingScreenState extends State<MatchingScreen>
             "Female Details",
             style: GoogleFonts.dmSans(
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 12),
@@ -552,54 +665,4 @@ class _MatchingScreenState extends State<MatchingScreen>
       ),
     );
   }
-}
-
-PreferredSizeWidget _matchTopBar(BuildContext context) {
-  final theme = Theme.of(context);
-  final colors = theme.colorScheme;
-  final isDark = theme.brightness == Brightness.dark;
-
-  return PreferredSize(
-    preferredSize: const Size.fromHeight(100),
-    child: Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppGradients.glassFill(theme),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppGradients.glassBorder(theme)),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withOpacity(0.4)
-                : Colors.black.withOpacity(0.08),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Title
-                Text(
-                  "Matching",
-                  style: GoogleFonts.dmSans(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : colors.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
 }

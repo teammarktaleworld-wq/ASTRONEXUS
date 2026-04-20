@@ -24,23 +24,23 @@ class SearchField extends StatelessWidget {
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final surface = isDark
-      ? Colors.white.withOpacity(0.97) // white background in dark mode
-      : Colors.white.withOpacity(0.96);
+        ? Colors.white.withOpacity(0.97) // white background in dark mode
+        : Colors.white.withOpacity(0.96);
     final border = isDark
-      ? Colors.black.withOpacity(0.08) // subtle border in dark mode
-      : colors.primary.withOpacity(0.22);
+        ? Colors.black.withOpacity(0.08) // subtle border in dark mode
+        : colors.primary.withOpacity(0.22);
     final hint = isDark
-      ? const Color(0xFF6B7280) // dark hint in white field
-      : colors.onSurface.withOpacity(0.52);
+        ? const Color(0xFF6B7280) // dark hint in white field
+        : colors.onSurface.withOpacity(0.52);
     final textColor = isDark
-      ? const Color(0xFF23264A) // dark text for white field
-      : colors.onSurface;
+        ? const Color(0xFF23264A) // dark text for white field
+        : colors.onSurface;
     final iconColor = isDark
-      ? const Color(0xFF8B7CF6) // accent icon in dark mode
-      : colors.primary;
+        ? const Color(0xFF8B7CF6) // accent icon in dark mode
+        : colors.primary;
     final shadow = isDark
-      ? Colors.black.withOpacity(0.13)
-      : Colors.black.withOpacity(0.08);
+        ? Colors.black.withOpacity(0.13)
+        : Colors.black.withOpacity(0.08);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
@@ -82,11 +82,7 @@ class SearchField extends StatelessWidget {
                       : colors.primary.withOpacity(0.10),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(
-                  Icons.search_rounded,
-                  color: iconColor,
-                  size: 20,
-                ),
+                child: Icon(Icons.search_rounded, color: iconColor, size: 20),
               ),
               suffixIcon: isSearching
                   ? IconButton(

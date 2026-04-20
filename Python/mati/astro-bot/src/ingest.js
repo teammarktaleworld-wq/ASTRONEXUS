@@ -1,11 +1,11 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
 import { embedText } from './lib/togetherClient.js';
 import { initStore, upsertVector } from './lib/localVectorStore.js';
+import { ensureEnvLoaded } from './lib/env.js';
 
-dotenv.config();
+ensureEnvLoaded();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

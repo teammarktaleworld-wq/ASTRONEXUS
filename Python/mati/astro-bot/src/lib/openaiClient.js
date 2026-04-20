@@ -1,4 +1,38 @@
 import fetch from 'node-fetch';
+import './env.js';
+
+function tryParseJson(text) {
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return null;
+  }
+}
+
+function buildProviderError(config, response, errorText) {
+  const parsedError = tryParseJson(errorText);
+  const upstreamError = parsedError?.error || {};
+  const upstreamMessage =
+    String(upstreamError.message || '').trim() ||
+    `${config.provider.toUpperCase()} API error (${response.status})`;
+
+  const error = new Error(`${config.provider.toUpperCase()} API error (${response.status}): ${upstreamMessage}`);
+  error.statusCode = response.status;
+  error.provider = config.provider;
+  error.providerCode = upstreamError.code || '';
+  error.upstreamMessage = upstreamMessage;
+  error.isCredentialError =
+    response.status === 401 ||
+    upstreamError.code === 'invalid_api_key' ||
+    /invalid api key/i.test(upstreamMessage);
+
+  if (error.isCredentialError) {
+    const envVarName = config.provider === 'groq' ? 'GROQ_API_KEY' : 'OPENAI_API_KEY';
+    error.userMessage = `Configured ${envVarName} is invalid or expired. Update Python/mati/astro-bot/.env with a valid ${config.provider} API key and restart the service.`;
+  }
+
+  return error;
+}
 
 // Auto-detect API provider based on key prefix
 function getAPIConfig() {
@@ -73,7 +107,7 @@ export async function callModel({ model, messages, temperature = 0.3, max_tokens
       if (isDev) {
         console.debug(`[${config.provider}Client] Error response:`, errorText);
       }
-      throw new Error(`${config.provider.toUpperCase()} API error (${response.status}): ${errorText}`);
+      throw buildProviderError(config, response, errorText);
     }
 
     const data = await response.json();
