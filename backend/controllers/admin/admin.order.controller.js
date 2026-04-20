@@ -10,10 +10,22 @@ export const getAllOrders = async (req, res) => {
       .populate({ path: "user", select: "name email" })
       .sort({ createdAt: -1 });
 
+    // Add total field to each order
+    const ordersWithTotal = orders.map(order => {
+      const total = order.items.reduce((sum, item) => {
+        // item.product.price may be undefined if not populated correctly
+        return sum + ((item.product?.price || 0) * (item.quantity || 1));
+      }, 0);
+      return {
+        ...order.toObject(),
+        total
+      };
+    });
+
     res.json({
       success: true,
-      count: orders.length,
-      orders
+      count: ordersWithTotal.length,
+      orders: ordersWithTotal
     });
   } catch (err) {
     console.error("GET ALL ORDERS ERROR:", err);
